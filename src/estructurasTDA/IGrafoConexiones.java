@@ -2,7 +2,7 @@ package estructurasTDA;
 
 public interface IGrafoConexiones {
     void agregarVertice(int idUsuario);
-    void eliminarVertice(int idOrigen, int idDestino);
+    void eliminarVertice(int idUsuario);
     void agregarArista(int idOrigen, int idDestino);
     void eliminarArista(int idOrigen, int idDestino);
     boolean existeArista(int idOrigen, int idDestino);
