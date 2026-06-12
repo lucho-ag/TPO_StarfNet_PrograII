@@ -1,4 +1,4 @@
-import interfaz.Consola;
+package interfaz;
 
 public class Main {
     public static void main(String[] args) {
