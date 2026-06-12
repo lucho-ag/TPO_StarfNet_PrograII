@@ -1,5 +1,4 @@
 package estructurasTDA;
-
 import entidades.PerfilEstado;
 
 public interface IPilaCambios {
