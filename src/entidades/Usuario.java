@@ -1,5 +1,4 @@
 package entidades;
-import estructurasTDA.IPilaCambios;
 import estructurasTDA.PilaCambios;
 import estructurasTDA.IColaUsuarios;
 import estructurasTDA.ColaUsuarios;
@@ -14,7 +13,7 @@ public class Usuario {
     private String resumen;
     private String rol;
     private boolean activo;
-    private IPilaCambios historial;
+    private PilaCambios historial;
     private IColaUsuarios solicitudesPendientes; // RF10 — nuevo
 
     public Usuario(int id, String nombre, String email,
@@ -34,7 +33,7 @@ public class Usuario {
     public String getEmail() { return email; }
     public String getRol() { return rol; }
     public boolean isActivo() { return activo; }
-    public IPilaCambios getHistorial() { return historial; }
+    public PilaCambios getHistorial() { return historial; }
     public IColaUsuarios getSolicitudesPendientes() { return solicitudesPendientes; } // nuevo
     public String getProfesion() { return profesion != null ? profesion : "-"; }
     public String getCiudad() { return ciudad != null ? ciudad : "-"; }

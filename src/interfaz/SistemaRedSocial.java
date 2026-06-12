@@ -223,4 +223,23 @@ public class SistemaRedSocial {
     }
 
     public Usuario getUsuarioActual() { return usuarioActual; }
+
+    public boolean agregarHabilidadUsuario(int idUsuario, String nombreHab, String categoriaHab) {
+        Usuario u = buscarUsuario(idUsuario);
+        if (u == null) return false;
+        // Acá insertás la lógica usando tu TDA ArbolHabilidades
+        // Ej: u.getArbolHabilidades().insertar(new Habilidad(..., nombreHab, categoriaHab));
+        return true;
+    }
+
+    public int[] obtenerContactos(int idUsuario) {
+        if (buscarUsuario(idUsuario) == null) return null;
+        return grafoContactos.obtenerContactos(idUsuario);
+    }
+
+    public int calcularGradosDeSeparacion(int idOrigen, int idDestino) {
+        if (buscarUsuario(idOrigen) == null || buscarUsuario(idDestino) == null) return -2;
+        return grafoContactos.calcularGradosDeSeparacion(idOrigen, idDestino);
+    }
 }
+
