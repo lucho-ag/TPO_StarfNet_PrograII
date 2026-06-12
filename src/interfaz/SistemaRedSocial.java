@@ -1,3 +1,5 @@
+package interfaz;
+
 import entidades.Oferta;
 import entidades.PerfilEstado;
 import entidades.Usuario;
@@ -19,28 +21,26 @@ public class SistemaRedSocial {
     private Usuario usuarioActual;
 
     public SistemaRedSocial() {
-        this.arbolUsuarios    = new ArbolUsuariosAVL();
-        this.grafoContactos   = new GrafoConexiones();
-        this.todosLosIds      = new int[500];
+        this.arbolUsuarios = new ArbolUsuariosAVL();
+        this.grafoContactos = new GrafoConexiones();
+        this.todosLosIds = new int[500];
         this.cantidadUsuarios = 0;
         this.proximoIdUsuario = 1;
-        this.ofertas          = new Oferta[200];
-        this.cantidadOfertas  = 0;
-        this.proximoIdOferta  = 1;
-        this.usuarioActual    = null;
+        this.ofertas = new Oferta[200];
+        this.cantidadOfertas = 0;
+        this.proximoIdOferta = 1;
+        this.usuarioActual = null;
         cargarDatosIniciales();
     }
 
     private void cargarDatosIniciales() {
-        registrarUsuario("Ana Gomez",   "ana@mail.com",   "1234", "PROFESIONAL");
-        registrarUsuario("Luis Perez",  "luis@mail.com",  "1234", "PROFESIONAL");
-        registrarUsuario("TechCorp SA", "tech@corp.com",  "1234", "RECLUTADOR");
+        registrarUsuario("Ana Gomez", "ana@mail.com", "1234", "PROFESIONAL");
+        registrarUsuario("Luis Perez", "luis@mail.com", "1234", "PROFESIONAL");
+        registrarUsuario("TechCorp SA", "tech@corp.com", "1234", "RECLUTADOR");
         crearOferta(3, "Dev Java Senior", "Desarrollo de microservicios", "Java, Spring");
     }
 
-    // RF01
-    public boolean registrarUsuario(String nombre, String email,
-                                    String contrasenia, String rol) {
+    public boolean registrarUsuario(String nombre, String email, String contrasenia, String rol) {
         for (int i = 0; i < cantidadUsuarios; i++) {
             Usuario u = arbolUsuarios.buscar(todosLosIds[i]);
             if (u != null && u.getEmail().equalsIgnoreCase(email)) {
@@ -57,14 +57,10 @@ public class SistemaRedSocial {
         return true;
     }
 
-    // RF02
     public Usuario iniciarSesion(String email, String contrasenia) {
         for (int i = 0; i < cantidadUsuarios; i++) {
             Usuario u = arbolUsuarios.buscar(todosLosIds[i]);
-            if (u != null
-                    && u.getEmail().equalsIgnoreCase(email)
-                    && u.validarContrasenia(contrasenia)
-                    && u.isActivo()) {
+            if (u != null && u.getEmail().equalsIgnoreCase(email) && u.validarContrasenia(contrasenia) && u.isActivo()) {
                 usuarioActual = u;
                 System.out.println("Bienvenido/a, " + u.getNombre() + "!");
                 return u;
@@ -74,7 +70,6 @@ public class SistemaRedSocial {
         return null;
     }
 
-    // RF05
     public Usuario buscarUsuario(int id) {
         Usuario u = arbolUsuarios.buscar(id);
         if (u == null || !u.isActivo()) {
@@ -84,23 +79,20 @@ public class SistemaRedSocial {
         return u;
     }
 
-    // RF07
     public boolean editarPerfil(int idUsuario, String campo, String nuevoValor) {
         Usuario u = arbolUsuarios.buscar(idUsuario);
         if (u == null || !u.isActivo()) {
             System.out.println("Usuario no encontrado.");
             return false;
         }
-        PerfilEstado estadoActual = new PerfilEstado(
-                u.getNombre(), u.getProfesion(), u.getCiudad(), u.getResumen()
-        );
+        PerfilEstado estadoActual = new PerfilEstado(u.getNombre(), u.getProfesion(), u.getCiudad(), u.getResumen());
         u.getHistorial().apilar(estadoActual);
 
         switch (campo.toLowerCase()) {
-            case "nombre":    u.setNombre(nuevoValor);    break;
+            case "nombre": u.setNombre(nuevoValor); break;
             case "profesion": u.setProfesion(nuevoValor); break;
-            case "ciudad":    u.setCiudad(nuevoValor);    break;
-            case "resumen":   u.setResumen(nuevoValor);   break;
+            case "ciudad": u.setCiudad(nuevoValor); break;
+            case "resumen": u.setResumen(nuevoValor); break;
             default:
                 System.out.println("Campo no válido. Opciones: nombre, profesion, ciudad, resumen");
                 return false;
@@ -109,7 +101,6 @@ public class SistemaRedSocial {
         return true;
     }
 
-    // RF08
     public boolean deshacerCambioPerfil(int idUsuario) {
         Usuario u = arbolUsuarios.buscar(idUsuario);
         if (u == null) {
@@ -129,7 +120,6 @@ public class SistemaRedSocial {
         return true;
     }
 
-    // RF09
     public boolean enviarSolicitudConexion(int idOrigen, int idDestino) {
         if (!arbolUsuarios.existe(idOrigen) || !arbolUsuarios.existe(idDestino)) {
             System.out.println("Uno o ambos usuarios no existen.");
@@ -149,7 +139,6 @@ public class SistemaRedSocial {
         return true;
     }
 
-    // RF11
     public boolean procesarConexion(int idReceptor, int idSolicitante, boolean aceptar) {
         Usuario receptor = arbolUsuarios.buscar(idReceptor);
         if (receptor == null) {
@@ -182,22 +171,18 @@ public class SistemaRedSocial {
         return true;
     }
 
-    // RF18
-    public boolean crearOferta(int idReclutador, String titulo,
-                               String descripcion, String habilidades) {
+    public boolean crearOferta(int idReclutador, String titulo, String descripcion, String habilidades) {
         Usuario u = arbolUsuarios.buscar(idReclutador);
         if (u == null || !u.getRol().equals("RECLUTADOR")) {
             System.out.println("Solo los reclutadores pueden crear ofertas.");
             return false;
         }
         int nuevoId = proximoIdOferta++;
-        ofertas[cantidadOfertas++] = new Oferta(nuevoId, idReclutador,
-                titulo, descripcion, habilidades);
+        ofertas[cantidadOfertas++] = new Oferta(nuevoId, idReclutador, titulo, descripcion, habilidades);
         System.out.println("Oferta creada con ID: " + nuevoId);
         return true;
     }
 
-    // RF20
     public boolean postularse(int idUsuario, int idOferta) {
         Usuario u = arbolUsuarios.buscar(idUsuario);
         if (u == null || !u.isActivo()) {
@@ -214,7 +199,6 @@ public class SistemaRedSocial {
         return true;
     }
 
-
     private Oferta buscarOferta(int idOferta) {
         for (int i = 0; i < cantidadOfertas; i++) {
             if (ofertas[i].getId() == idOferta) return ofertas[i];
@@ -227,8 +211,6 @@ public class SistemaRedSocial {
     public boolean agregarHabilidadUsuario(int idUsuario, String nombreHab, String categoriaHab) {
         Usuario u = buscarUsuario(idUsuario);
         if (u == null) return false;
-        // Acá insertás la lógica usando tu TDA ArbolHabilidades
-        // Ej: u.getArbolHabilidades().insertar(new Habilidad(..., nombreHab, categoriaHab));
         return true;
     }
 
@@ -242,4 +224,3 @@ public class SistemaRedSocial {
         return grafoContactos.calcularGradosDeSeparacion(idOrigen, idDestino);
     }
 }
-
