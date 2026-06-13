@@ -19,8 +19,6 @@ public class Consola {
             opcion = pedirEntero("Seleccione una opción: ");
             System.out.println();
 
-            opcion = pedirEntero("Seleccione una opción: ");
-
             switch (opcion) {
                 case 1:
                     ejecutarLogin(); break;
@@ -78,7 +76,8 @@ public class Consola {
             System.out.println("2. Editar mi Perfil");
             System.out.println("3. Deshacer Último Cambio de Perfil (Pila)");
             System.out.println("4. Buscar Empleos");
-            System.out.println("4. Mi Red de Contactos (Sugerencias)");
+            System.out.println("5. Mi Red de Contactos (Sugerencias)");
+            System.out.println("6. Explorar Catálogo de Habilidades y Agregar");
             System.out.println("0. Cerrar Sesión");
             opcion = pedirEntero("Opción: ");
 
@@ -101,6 +100,9 @@ public class Consola {
                 case 5:
                     System.out.println("Próximamente: Sugerencias con Grafos...");
                     esperarEnter();
+                    break;
+                case 6:
+                    ejecutarAgregarHabilidad();
                     break;
                 case 0:
                     sistema.cerrarSesion();
@@ -231,7 +233,7 @@ public class Consola {
         simularEntrada("Ingrese el ID del usuario: ", "5");
         simularEntrada("Ingrese el nombre de la habilidad: ", "Angular");
         simularEntrada("Ingrese la categoría: ", "Frontend");
-        sistema.agregarHabilidadUsuario(5, "Angular", "Frontend");
+        // sistema.agregarHabilidadUsuario(5, "Angular", "Frontend");
 
         imprimirEncabezado("FUNCIÓN 7: ENVIAR SOLICITUD DE CONEXIÓN");
         simularEntrada("Ingrese su ID (Solicitante): ", "4");
@@ -312,31 +314,25 @@ public class Consola {
     }
 
     private void ejecutarAgregarHabilidad() {
-        while (true) {
-            imprimirEncabezado("AGREGAR HABILIDAD AL PERFIL");
-            int id = pedirEntero("Ingrese el ID del usuario: ");
+        imprimirEncabezado("CATÁLOGO JERÁRQUICO DE HABILIDADES");
+        sistema.getArbolHabilidades().mostrarEstructura();
 
-            Usuario u = sistema.buscarUsuario(id);
-            if (u == null) {
-                if (!deseaReintentar()) return;
-                continue;
-            }
+        System.out.println("\n¿Qué deseas hacer?");
+        System.out.println("1. Agregar una habilidad a mi perfil");
+        System.out.println("2. Ver especialidades de una rama (Buscar por ID de categoría)");
+        System.out.println("0. Volver");
+        int opc = pedirEntero("Opción: ");
 
-            System.out.print("Ingrese el nombre de la habilidad (ej. Java, Liderazgo): ");
+        if (opc == 1) {
+            System.out.print("Escribe el nombre exacto de la tecnología (Ej: Java): ");
             String nombreHab = scanner.nextLine();
-            System.out.print("Ingrese la categoría (ej. Backend, Soft Skill): ");
-            String categoriaHab = scanner.nextLine();
+            sistema.agregarHabilidadAlPerfilActual(nombreHab);
 
-            boolean exito = sistema.agregarHabilidadUsuario(id, nombreHab, categoriaHab);
-
-            if (exito) {
-                System.out.println("\n[✅ ÉXITO] Habilidad agregada correctamente.");
-                esperarEnter();
-                return;
-            } else {
-                if (!deseaReintentar()) return;
-            }
+        } else if (opc == 2) {
+            int idRama = pedirEntero("Ingresa el [ID] numérico de la categoría a explorar (Ej: 2): ");
+            sistema.getArbolHabilidades().mostrarSubEstructura(idRama);
         }
+        esperarEnter();
     }
 
     private void ejecutarEnviarSolicitud() {

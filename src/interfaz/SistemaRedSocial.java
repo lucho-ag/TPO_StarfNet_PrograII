@@ -1,14 +1,13 @@
 package interfaz;
 
-import entidades.Oferta;
-import entidades.PerfilEstado;
-import entidades.Usuario;
+import entidades.*;
 import estructurasTDA.*;
 
 public class SistemaRedSocial {
 
     private IArbolUsuariosAVL arbolUsuarios;
     private IGrafoConexiones grafoContactos;
+    private ArbolHabilidades arbolHabilidades;
 
     private int[] todosLosIds;
     private int cantidadUsuarios;
@@ -30,6 +29,8 @@ public class SistemaRedSocial {
         this.cantidadOfertas = 0;
         this.proximoIdOferta = 1;
         this.usuarioActual = null;
+        this.arbolHabilidades = new ArbolHabilidades();
+        cargarArbolHabilidadesDefault();
     }
 
     public boolean registrarUsuario(String nombre, String email, String contrasenia, String rol) {
@@ -214,10 +215,43 @@ public class SistemaRedSocial {
         return usuarioActual;
     }
 
-    public boolean agregarHabilidadUsuario(int idUsuario, String nombreHab, String categoriaHab) {
-        Usuario u = buscarUsuario(idUsuario);
-        if (u == null) return false;
-        return true;
+    private void cargarArbolHabilidadesDefault() {
+        arbolHabilidades.insertar(0, new Habilidad(1, "Tecnología y Sistemas", "Raíz"));
+
+        arbolHabilidades.insertar(1, new Habilidad(2, "Desarrollo de Software", "Rama"));
+        arbolHabilidades.insertar(1, new Habilidad(3, "Datos e IA", "Rama"));
+
+        arbolHabilidades.insertar(2, new Habilidad(4, "Java", "Tecnología"));
+        arbolHabilidades.insertar(2, new Habilidad(5, "Python", "Tecnología"));
+        arbolHabilidades.insertar(2, new Habilidad(6, "Desarrollo Web (HTML/CSS)", "Tecnología"));
+
+        arbolHabilidades.insertar(3, new Habilidad(7, "SQL", "Tecnología"));
+        arbolHabilidades.insertar(3, new Habilidad(8, "Machine Learning", "Tecnología"));
+    }
+
+    public void agregarHabilidadAlPerfilActual(String nombreHabilidad) {
+        if (this.usuarioActual == null) {
+            System.out.println("[❌] Inicia sesión primero.");
+            return;
+        }
+
+        Habilidad habEncontrada = arbolHabilidades.buscarPorNombre(nombreHabilidad);
+
+        if (habEncontrada == null) {
+            System.out.println("[❌] No existe la habilidad '" + nombreHabilidad + "' en el catálogo.");
+            return;
+        }
+
+        boolean exito = this.usuarioActual.agregarHabilidad(habEncontrada);
+        if (exito) {
+            System.out.println("[✅] ¡Habilidad '" + habEncontrada.getNombre() + "' agregada a tu perfil!");
+        } else {
+            System.out.println("[⚠️] Ya posees esta habilidad o llegaste al límite.");
+        }
+    }
+
+    public ArbolHabilidades getArbolHabilidades() {
+        return arbolHabilidades;
     }
 
     public int[] obtenerContactos(int idUsuario) {

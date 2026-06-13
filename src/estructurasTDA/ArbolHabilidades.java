@@ -11,12 +11,17 @@ public class ArbolHabilidades implements IArbolHabilidades {
     @Override
     public void insertar(int idPadre, Habilidad nuevaHabilidad) {
         NodoArbolHabilidades nuevoNodo = new NodoArbolHabilidades(nuevaHabilidad);
+
         if (raiz == null) {
             raiz = nuevoNodo;
             return;
         }
+
         NodoArbolHabilidades padre = buscarNodo(raiz, idPadre);
-        if (padre == null) return;
+        if (padre == null) {
+            System.out.println("[⚠️] No se encontró la categoría padre con ID: " + idPadre);
+            return;
+        }
 
         if (padre.primerHijo == null) {
             padre.primerHijo = nuevoNodo;
@@ -32,12 +37,27 @@ public class ArbolHabilidades implements IArbolHabilidades {
     @Override
     public Habilidad buscar(int idHabilidad) {
         NodoArbolHabilidades nodo = buscarNodo(raiz, idHabilidad);
-        return nodo != null ? nodo.habilidad : null;
+        if (nodo != null) {
+            return nodo.habilidad;
+        } else {
+            return null;
+        }
     }
 
     @Override
     public void mostrarEstructura() {
+        System.out.println("\n--- CATÁLOGO GLOBAL DE HABILIDADES ---");
         mostrarRecursivo(raiz, 0);
+    }
+
+    public void mostrarSubEstructura(int idEspecialidad) {
+        NodoArbolHabilidades subRaiz = buscarNodo(raiz, idEspecialidad);
+        if (subRaiz != null) {
+            System.out.println("\n--- ESPECIALIDAD: " + subRaiz.habilidad.getNombre() + " ---");
+            mostrarRecursivo(subRaiz, 0);
+        } else {
+            System.out.println("[❌] Especialidad no encontrada.");
+        }
     }
 
     private void mostrarRecursivo(NodoArbolHabilidades nodo, int nivel) {
@@ -55,5 +75,23 @@ public class ArbolHabilidades implements IArbolHabilidades {
         NodoArbolHabilidades porHijo = buscarNodo(nodo.primerHijo, id);
         if (porHijo != null) return porHijo;
         return buscarNodo(nodo.hermano, id);
+    }
+
+    public Habilidad buscarPorNombre(String nombre) {
+        NodoArbolHabilidades nodo = buscarNodoPorNombre(raiz, nombre);
+        return nodo != null ? nodo.habilidad : null;
+    }
+
+    private NodoArbolHabilidades buscarNodoPorNombre(NodoArbolHabilidades nodo, String nombre) {
+        if (nodo == null) return null;
+
+        if (nodo.habilidad.getNombre().equalsIgnoreCase(nombre.trim())) {
+            return nodo;
+        }
+
+        NodoArbolHabilidades encontrado = buscarNodoPorNombre(nodo.primerHijo, nombre);
+        if (encontrado != null) return encontrado;
+
+        return buscarNodoPorNombre(nodo.hermano, nombre);
     }
 }

@@ -15,6 +15,8 @@ public class Usuario {
     private boolean activo;
     private PilaCambios historial;
     private IColaUsuarios solicitudesPendientes;
+    private Habilidad[] misHabilidades = new Habilidad[15];
+    private int cantHabilidades = 0;
 
     public Usuario(int id, String nombre, String email, String contrasenia, String rol) {
         this.id = id;
@@ -25,6 +27,28 @@ public class Usuario {
         this.activo = true;
         this.historial = new PilaCambios();
         this.solicitudesPendientes = new ColaUsuarios();
+    }
+
+    public boolean agregarHabilidad(Habilidad hab) {
+        for(int i=0; i<cantHabilidades; i++){
+            if (misHabilidades[i].getId() == hab.getId()) {
+                return false;
+            }
+        }
+        if (cantHabilidades < 15) {
+            misHabilidades[cantHabilidades++] = hab;
+            return true;
+        }
+        return false;
+    }
+
+    public String obtenerHabilidadesString() {
+        if (cantHabilidades == 0) return "Ninguna habilidad cargada.";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < cantHabilidades; i++) {
+            sb.append(misHabilidades[i].getNombre()).append(", ");
+        }
+        return sb.toString();
     }
 
     public int getId() { return id; }
@@ -54,6 +78,7 @@ public class Usuario {
                 "  ID       : " + id + "\n" +
                 "  Nombre   : " + nombre + "\n" +
                 "  Profesión: " + getProfesion() + "\n" +
+                "  Habilidades: " + obtenerHabilidadesString() + "\n" +
                 "  Ciudad   : " + getCiudad() + "\n" +
                 "  Resumen  : " + getResumen() + "\n" +
                 "  Rol      : " + rol + "\n" +
