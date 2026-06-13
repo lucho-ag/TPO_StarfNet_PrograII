@@ -10,6 +10,7 @@
 Para el desarrollo del sistema, hemos implementado las siguientes estructuras de datos abstractas (TDA) para asegurar un manejo eficiente de la información:
 
 * **Árbol AVL:** Estructura de búsqueda auto-balanceada utilizada como base de datos principal para almacenar y gestionar los usuarios del sistema, garantizando tiempos de respuesta óptimos.
+* **Árbol N-ario:** Estructura jerárquica empleada para organizar y categorizar el catálogo de habilidades técnicas disponibles.
 * **Grafo no dirigido:** Utilizado para representar la red de contactos, donde cada usuario es un nodo y cada conexión es una arista, permitiendo mapear toda la red social.
 * **Cola (FIFO):** Implementada para gestionar las solicitudes de conexión pendientes y el orden de llegada de los postulantes a las ofertas laborales.
 * **Pila (LIFO):** Estructura utilizada para gestionar el historial de edición de perfiles, permitiendo deshacer cambios de forma eficiente.
@@ -34,7 +35,7 @@ El programa abarca todo el ciclo de interacción de una red social laboral, divi
 ### Networking y Red de Contactos
 * **Búsqueda global:** Localización de perfiles ingresando el nombre de usuario exacto.
 * **Solicitudes de conexión:** Envío de invitaciones a otros usuarios de la plataforma.
-* **Bandeja de entrada:** Procesamiento (aceptar o rechazar) de las solicitudes de conexión pendientes.
+* **Bandeja de entrada:** Procesamiento (aceptar o rechazar) las solicitudes de conexión pendientes.
 * **Directorio:** Visualización del listado completo de contactos directos.
 * **Motor de recomendaciones:** Sugiere nuevas personas para conectar analizando la cantidad de amigos en común. Si la red está vacía, recomienda usuarios que compartan la misma profesión.
 
@@ -44,3 +45,11 @@ El programa abarca todo el ciclo de interacción de una red social laboral, divi
 
 ### Simulación Automática
 * **Prueba de integración:** El sistema incluye un modo de "Prueba Automática" en el menú principal que ejecuta de forma secuencial un recorrido completo por todas las opciones. Esto simula la interacción real entre un reclutador y un profesional para verificar el correcto funcionamiento de todos los módulos sin necesidad de cargar los datos de forma manual.
+
+---
+
+## Contribuciones del equipo
+
+* **Agostino Luciano:** Responsable de la arquitectura base del proyecto mediante la implementación de las estructuras de datos fundamentales como el Grafo de conexiones y la Cola de usuarios. Se encargó de la creación del Árbol AVL para la gestión de usuarios, definió las interfaces críticas del sistema y realizó actualizaciones de los métodos de búsqueda, la lógica de conexiones y el método de intersección de conjuntos.
+* **Ielpi Facundo:** Creación y configuración del archivo README del proyecto. Desarrolló la implementación técnica de la interfaz de la consola, asegurando la interacción fluida del usuario. Fue responsable de la configuración del archivo principal (main), la integración de la carga de datos del modelo, los cambios estructurales en la clase Usuario y la sincronización general del sistema mediante múltiples merges de ramas.
+* **Luca Vilajosana Juan:** Responsable de la estructuración de las entidades del dominio como `Habilidad` y `PerfilEstado`. Implementó la clase `Usuario` y consolidó el `SistemaRedSocial`, junto con el desarrollo de la `PilaCambios` y sus nodos, asegurando la integridad de las estructuras de datos y su correcta integración con las interfaces del programa.
