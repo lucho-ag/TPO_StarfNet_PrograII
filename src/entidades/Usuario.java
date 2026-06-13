@@ -1,10 +1,12 @@
 package entidades;
+
 import estructurasTDA.PilaCambios;
 import estructurasTDA.IColaUsuarios;
 import estructurasTDA.ColaUsuarios;
 
 public class Usuario {
     private int id;
+    private String nombreUsuario;
     private String nombre;
     private String email;
     private String contrasenia;
@@ -18,8 +20,9 @@ public class Usuario {
     private Habilidad[] misHabilidades = new Habilidad[15];
     private int cantHabilidades = 0;
 
-    public Usuario(int id, String nombre, String email, String contrasenia, String rol) {
+    public Usuario(int id, String nombreUsuario, String nombre, String email, String contrasenia, String rol) {
         this.id = id;
+        this.nombreUsuario = nombreUsuario;
         this.nombre = nombre;
         this.email = email;
         this.contrasenia = contrasenia;
@@ -52,16 +55,18 @@ public class Usuario {
     }
 
     public int getId() { return id; }
+    public String getNombreUsuario() { return nombreUsuario; }
     public String getNombre() { return nombre; }
     public String getEmail() { return email; }
     public String getRol() { return rol; }
     public boolean isActivo() { return activo; }
     public PilaCambios getHistorial() { return historial; }
-    public IColaUsuarios getSolicitudesPendientes() { return solicitudesPendientes; } // nuevo
+    public IColaUsuarios getSolicitudesPendientes() { return solicitudesPendientes; }
     public String getProfesion() { return profesion != null ? profesion : "-"; }
     public String getCiudad() { return ciudad != null ? ciudad : "-"; }
     public String getResumen() { return resumen != null ? resumen : "-"; }
 
+    public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
     public void setNombre(String nombre) { this.nombre = nombre; }
     public void setProfesion(String profesion) { this.profesion = profesion; }
     public void setCiudad(String ciudad) { this.ciudad = ciudad; }
@@ -75,7 +80,7 @@ public class Usuario {
     @Override
     public String toString() {
         return "================================\n" +
-                "  ID       : " + id + "\n" +
+                "  Usuario  : @" + nombreUsuario + "\n" +
                 "  Nombre   : " + nombre + "\n" +
                 "  Profesión: " + getProfesion() + "\n" +
                 "  Habilidades: " + obtenerHabilidadesString() + "\n" +
