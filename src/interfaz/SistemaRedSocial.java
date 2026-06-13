@@ -71,16 +71,48 @@ public class SistemaRedSocial {
     }
 
     public void editarPerfilActual(String nombre, String profesion, String ciudad, String resumen) {
-        if (this.usuarioActual != null) {
-
-            this.usuarioActual.setNombre(nombre);
-            this.usuarioActual.setProfesion(profesion);
-            this.usuarioActual.setCiudad(ciudad);
-            this.usuarioActual.setResumen(resumen);
-            System.out.println("[✅] Perfil actualizado con éxito.");
-        } else {
+        if (this.usuarioActual == null) {
             System.out.println("[❌] Error de seguridad: No hay sesión activa.");
+            return;
         }
+
+        PerfilEstado estadoAnterior = new PerfilEstado(
+                this.usuarioActual.getNombre(),
+                this.usuarioActual.getProfesion(),
+                this.usuarioActual.getCiudad(),
+                this.usuarioActual.getResumen()
+        );
+
+        this.usuarioActual.getHistorial().apilar(estadoAnterior);
+
+        this.usuarioActual.setNombre(nombre);
+        this.usuarioActual.setProfesion(profesion);
+        this.usuarioActual.setCiudad(ciudad);
+        this.usuarioActual.setResumen(resumen);
+
+        System.out.println("[✅] Perfil actualizado con éxito. Cambio respaldado en el historial.");
+    }
+
+    public boolean deshacerUltimoCambio() {
+        if (this.usuarioActual == null) {
+            System.out.println("[❌] Error: No hay sesión activa.");
+            return false;
+        }
+
+        if (this.usuarioActual.getHistorial().estaVacia()) {
+            System.out.println("[⚠️] No hay más cambios para deshacer en esta sesión.");
+            return false;
+        }
+
+        PerfilEstado ultimoEstado = this.usuarioActual.getHistorial().desapilar();
+
+        this.usuarioActual.setNombre(ultimoEstado.getNombre());
+        this.usuarioActual.setProfesion(ultimoEstado.getProfesion());
+        this.usuarioActual.setCiudad(ultimoEstado.getCiudad());
+        this.usuarioActual.setResumen(ultimoEstado.getResumen());
+
+        System.out.println("[⏪] ¡Cambio deshecho! Se ha restaurado la versión anterior de tu perfil.");
+        return true;
     }
 
     public Usuario buscarUsuario(int id) {
@@ -90,26 +122,6 @@ public class SistemaRedSocial {
             return null;
         }
         return u;
-    }
-
-
-    public boolean deshacerCambioPerfil(int idUsuario) {
-        Usuario u = arbolUsuarios.buscar(idUsuario);
-        if (u == null) {
-            System.out.println("Usuario no encontrado.");
-            return false;
-        }
-        if (u.getHistorial().estaVacia()) {
-            System.out.println("No hay cambios para deshacer.");
-            return false;
-        }
-        PerfilEstado anterior = u.getHistorial().desapilar();
-        u.setNombre(anterior.getNombre());
-        u.setProfesion(anterior.getProfesion());
-        u.setCiudad(anterior.getCiudad());
-        u.setResumen(anterior.getResumen());
-        System.out.println("Último cambio revertido exitosamente.");
-        return true;
     }
 
     public boolean enviarSolicitudConexion(int idOrigen, int idDestino) {

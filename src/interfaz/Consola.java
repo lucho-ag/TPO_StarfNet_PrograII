@@ -76,11 +76,10 @@ public class Consola {
             imprimirEncabezado("PANEL DE PROFESIONAL");
             System.out.println("1. Ver mi Perfil");
             System.out.println("2. Editar mi Perfil");
-            System.out.println("3. Mi Red de Contactos (Sugerencias)");
+            System.out.println("3. Deshacer Último Cambio de Perfil (Pila)");
             System.out.println("4. Buscar Empleos");
+            System.out.println("4. Mi Red de Contactos (Sugerencias)");
             System.out.println("0. Cerrar Sesión");
-            System.out.println("-------------------------------------------------");
-
             opcion = pedirEntero("Opción: ");
 
             switch (opcion) {
@@ -92,18 +91,24 @@ public class Consola {
                     ejecutarEditarMiPerfil();
                     break;
                 case 3:
-                    System.out.println("Próximamente: Sugerencias con Grafos...");
+                    sistema.deshacerUltimoCambio();
                     esperarEnter();
                     break;
                 case 4:
                     System.out.println("Próximamente: Postulación a ofertas...");
                     esperarEnter();
                     break;
+                case 5:
+                    System.out.println("Próximamente: Sugerencias con Grafos...");
+                    esperarEnter();
+                    break;
                 case 0:
                     sistema.cerrarSesion();
                     System.out.println("[ℹ️] Sesión cerrada.");
                     break;
-                default: System.out.println("[⚠️] Opción inválida.");
+                default:
+                    System.out.println("[⚠️] Opción inválida.");
+                    esperarEnter();
             }
         } while (opcion != 0);
     }
@@ -217,10 +222,10 @@ public class Consola {
 
         imprimirEncabezado("FUNCIÓN 5: DESHACER ÚLTIMO CAMBIO");
         simularEntrada("Ingrese el ID del usuario a deshacer cambio: ", "5");
-        sistema.deshacerCambioPerfil(5);
+        sistema.deshacerUltimoCambio();
 
         System.out.println("(Rehaciendo edición automáticamente para continuar...)");
-        sistema.editarPerfilActual(5, "profesion", "Desarrolladora FullStack");
+        sistema.editarPerfilActual("", "profesion", "Desarrolladora FullStack","");
 
         imprimirEncabezado("FUNCIÓN 6: AGREGAR HABILIDAD AL PERFIL");
         simularEntrada("Ingrese el ID del usuario: ", "5");
@@ -302,8 +307,7 @@ public class Consola {
 
     private void ejecutarDeshacerCambio() {
         imprimirEncabezado("DESHACER ÚLTIMO CAMBIO");
-        int id = pedirEntero("Ingrese el ID del usuario: ");
-        sistema.deshacerCambioPerfil(id);
+        sistema.deshacerUltimoCambio();
         esperarEnter();
     }
 
