@@ -30,14 +30,6 @@ public class SistemaRedSocial {
         this.cantidadOfertas = 0;
         this.proximoIdOferta = 1;
         this.usuarioActual = null;
-        cargarDatosIniciales();
-    }
-
-    private void cargarDatosIniciales() {
-        registrarUsuario("Ana Gomez", "ana@mail.com", "1234", "PROFESIONAL");
-        registrarUsuario("Luis Perez", "luis@mail.com", "1234", "PROFESIONAL");
-        registrarUsuario("TechCorp SA", "tech@corp.com", "1234", "RECLUTADOR");
-        crearOferta(3, "Dev Java Senior", "Desarrollo de microservicios", "Java, Spring");
     }
 
     public boolean registrarUsuario(String nombre, String email, String contrasenia, String rol) {
@@ -57,17 +49,38 @@ public class SistemaRedSocial {
         return true;
     }
 
-    public Usuario iniciarSesion(String email, String contrasenia) {
+    public boolean iniciarSesion(String email, String contrasenia) {
         for (int i = 0; i < cantidadUsuarios; i++) {
             Usuario u = arbolUsuarios.buscar(todosLosIds[i]);
-            if (u != null && u.getEmail().equalsIgnoreCase(email) && u.validarContrasenia(contrasenia) && u.isActivo()) {
-                usuarioActual = u;
-                System.out.println("Bienvenido/a, " + u.getNombre() + "!");
-                return u;
+            if (u != null && u.getEmail().equalsIgnoreCase(email)) {
+                if (u.validarContrasenia(contrasenia)) {
+                    this.usuarioActual = u;
+                    return true;
+                } else {
+                    System.out.println("[❌] Error: Contraseña incorrecta.");
+                    return false;
+                }
             }
         }
-        System.out.println("Credenciales incorrectas o cuenta inactiva.");
-        return null;
+        System.out.println("[❌] Error: No existe ninguna cuenta con ese correo.");
+        return false;
+    }
+
+    public void cerrarSesion() {
+        this.usuarioActual = null;
+    }
+
+    public void editarPerfilActual(String nombre, String profesion, String ciudad, String resumen) {
+        if (this.usuarioActual != null) {
+
+            this.usuarioActual.setNombre(nombre);
+            this.usuarioActual.setProfesion(profesion);
+            this.usuarioActual.setCiudad(ciudad);
+            this.usuarioActual.setResumen(resumen);
+            System.out.println("[✅] Perfil actualizado con éxito.");
+        } else {
+            System.out.println("[❌] Error de seguridad: No hay sesión activa.");
+        }
     }
 
     public Usuario buscarUsuario(int id) {
@@ -79,27 +92,6 @@ public class SistemaRedSocial {
         return u;
     }
 
-    public boolean editarPerfil(int idUsuario, String campo, String nuevoValor) {
-        Usuario u = arbolUsuarios.buscar(idUsuario);
-        if (u == null || !u.isActivo()) {
-            System.out.println("Usuario no encontrado.");
-            return false;
-        }
-        PerfilEstado estadoActual = new PerfilEstado(u.getNombre(), u.getProfesion(), u.getCiudad(), u.getResumen());
-        u.getHistorial().apilar(estadoActual);
-
-        switch (campo.toLowerCase()) {
-            case "nombre": u.setNombre(nuevoValor); break;
-            case "profesion": u.setProfesion(nuevoValor); break;
-            case "ciudad": u.setCiudad(nuevoValor); break;
-            case "resumen": u.setResumen(nuevoValor); break;
-            default:
-                System.out.println("Campo no válido. Opciones: nombre, profesion, ciudad, resumen");
-                return false;
-        }
-        System.out.println("Perfil actualizado correctamente.");
-        return true;
-    }
 
     public boolean deshacerCambioPerfil(int idUsuario) {
         Usuario u = arbolUsuarios.buscar(idUsuario);
@@ -206,7 +198,9 @@ public class SistemaRedSocial {
         return null;
     }
 
-    public Usuario getUsuarioActual() { return usuarioActual; }
+    public Usuario getUsuarioActual() {
+        return usuarioActual;
+    }
 
     public boolean agregarHabilidadUsuario(int idUsuario, String nombreHab, String categoriaHab) {
         Usuario u = buscarUsuario(idUsuario);

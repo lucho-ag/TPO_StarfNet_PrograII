@@ -19,93 +19,164 @@ public class Consola {
             opcion = pedirEntero("Seleccione una opción: ");
             System.out.println();
 
+            opcion = pedirEntero("Seleccione una opción: ");
+
             switch (opcion) {
                 case 1:
-                    menuGestionUsuarios();
-                    break;
+                    ejecutarLogin(); break;
                 case 2:
-                    menuGestionContactos();
-                    break;
+                    ejecutarRegistro(); break;
                 case 3:
-                    ejecutarCargaDeDatos();
-                    break;
+                    ejecutarCargaDeDatos(); break;
                 case 0:
                     imprimirEncabezado("SALIENDO DEL SISTEMA");
                     System.out.println("¡Gracias por utilizar la aplicación!");
                     System.out.println("=================================================");
                     break;
-                default:
-                    System.out.println("[⚠️] Opción inválida. Intente nuevamente.");
-                    esperarEnter();
+                default: System.out.println("[⚠️] Opción inválida.");
             }
         } while (opcion != 0);
     }
 
     private void mostrarMenuPrincipal() {
         System.out.println("=================================================");
-        System.out.println("│          SISTEMA DE RED SOCIAL                │");
+        System.out.println("│         SISTEMA DE RED SOCIAL STARFNET        │");
         System.out.println("=================================================");
-        System.out.println("│  1. Gestión de Usuarios y Perfiles            │");
-        System.out.println("│  2. Gestión de Red y Solicitudes              │");
-        System.out.println("│  3. Ejemplo de carga de datos automática      │");
+        System.out.println("│  1. Iniciar Sesión                            │");
+        System.out.println("│  2. Registrar Nueva Cuenta                    │");
+        System.out.println("│  3. Cargar Datos de Prueba                    │");
         System.out.println("│  0. Salir del Programa                        │");
         System.out.println("=================================================");
     }
 
-    private void menuGestionUsuarios() {
-        int subOpcion;
-        do {
-            imprimirEncabezado("MENÚ: GESTIÓN DE USUARIOS");
-            System.out.println("1. Registrar nuevo Usuario");
-            System.out.println("2. Buscar Perfil por ID");
-            System.out.println("3. Editar Perfil");
-            System.out.println("4. Agregar Habilidad al Perfil");
-            System.out.println("5. Deshacer último cambio (Historial)");
-            System.out.println("0. Volver al menú principal");
-            System.out.println("-------------------------------------------------");
+    private void ejecutarLogin() {
+        imprimirEncabezado("INICIAR SESIÓN");
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        System.out.print("Contraseña: ");
+        String pass = scanner.nextLine();
 
-            subOpcion = pedirEntero("Seleccione una opción: ");
-            System.out.println();
+        if (sistema.iniciarSesion(email, pass)) {
+            String rol = sistema.getUsuarioActual().getRol();
+            System.out.println("\n[✅] ¡Bienvenido/a, " + sistema.getUsuarioActual().getNombre() + "!");
 
-            switch (subOpcion) {
-                case 1: ejecutarRegistrarUsuario(); break;
-                case 2: ejecutarBuscarUsuario(); break;
-                case 3: ejecutarEditarPerfil(); break;
-                case 4: ejecutarAgregarHabilidad(); break;
-                case 5: ejecutarDeshacerCambio(); break;
-                case 0: break;
-                default:
-                    System.out.println("[⚠️] Opción no válida.");
-                    esperarEnter();
+            if (rol.equalsIgnoreCase("Profesional")) {
+                menuProfesional();
+            } else if (rol.equalsIgnoreCase("Reclutador")) {
+                menuReclutador();
             }
-        } while (subOpcion != 0);
+        } else {
+            esperarEnter();
+        }
     }
 
-    private void menuGestionContactos() {
-        int subOpcion;
+    private void menuProfesional() {
+        int opcion;
         do {
-            imprimirEncabezado("MENÚ: GESTIÓN DE RED Y CONTACTOS");
-            System.out.println("1. Enviar Solicitud de Conexión");
-            System.out.println("2. Procesar Solicitudes Pendientes");
-            System.out.println("3. Ver lista de contactos de un Usuario");
-            System.out.println("4. Calcular Grados de Separación");
-            System.out.println("0. Volver al menú principal");
+            imprimirEncabezado("PANEL DE PROFESIONAL");
+            System.out.println("1. Ver mi Perfil");
+            System.out.println("2. Editar mi Perfil");
+            System.out.println("3. Mi Red de Contactos (Sugerencias)");
+            System.out.println("4. Buscar Empleos");
+            System.out.println("0. Cerrar Sesión");
             System.out.println("-------------------------------------------------");
 
-            subOpcion = pedirEntero("Seleccione una opción: ");
-            System.out.println();
+            opcion = pedirEntero("Opción: ");
 
-            switch (subOpcion) {
-                case 1: ejecutarEnviarSolicitud(); break;
-                case 2: ejecutarProcesarSolicitud(); break;
-                case 3: ejecutarVerContactos(); break;
-                case 4: ejecutarCalcularGrados(); break;
-                case 0: break;
-                default:
-                    System.out.println("[⚠️] Opción no válida.");
+            switch (opcion) {
+                case 1:
+                    System.out.println(sistema.getUsuarioActual().toString());
                     esperarEnter();
+                    break;
+                case 2:
+                    ejecutarEditarMiPerfil();
+                    break;
+                case 3:
+                    System.out.println("Próximamente: Sugerencias con Grafos...");
+                    esperarEnter();
+                    break;
+                case 4:
+                    System.out.println("Próximamente: Postulación a ofertas...");
+                    esperarEnter();
+                    break;
+                case 0:
+                    sistema.cerrarSesion();
+                    System.out.println("[ℹ️] Sesión cerrada.");
+                    break;
+                default: System.out.println("[⚠️] Opción inválida.");
             }
-        } while (subOpcion != 0);
+        } while (opcion != 0);
+    }
+
+    private void menuReclutador() {
+        int opcion;
+        do {
+            imprimirEncabezado("PANEL DE RECLUTADOR / EMPRESA");
+            System.out.println("1. Ver mis Ofertas Publicadas");
+            System.out.println("2. Publicar Nueva Oferta");
+            System.out.println("3. Evaluar Candidatos en Cola");
+            System.out.println("0. Cerrar Sesión");
+            System.out.println("-------------------------------------------------");
+
+            opcion = pedirEntero("Opción: ");
+
+            switch (opcion) {
+                case 1:
+                    System.out.println("Próximamente: Lista de ofertas...");
+                    esperarEnter();
+                    break;
+                case 0:
+                    sistema.cerrarSesion();
+                    System.out.println("[ℹ️] Sesión cerrada.");
+                    break;
+                default: System.out.println("Opción en construcción o inválida.");
+            }
+        } while (opcion != 0);
+    }
+
+    private void ejecutarEditarMiPerfil() {
+        imprimirEncabezado("EDITAR MI PERFIL");
+        System.out.print("Nuevo Nombre: ");
+        String nombre = scanner.nextLine();
+        System.out.print("Nueva Profesión: ");
+        String profesion = scanner.nextLine();
+        System.out.print("Nueva Ciudad: ");
+        String ciudad = scanner.nextLine();
+        System.out.print("Nuevo Resumen: ");
+        String resumen = scanner.nextLine();
+
+        sistema.editarPerfilActual(nombre, profesion, ciudad, resumen);
+        esperarEnter();
+    }
+
+    private void ejecutarRegistro() {
+        imprimirEncabezado("REGISTRO DE USUARIO");
+        System.out.print("Nombre completo: ");
+        String nombre = scanner.nextLine();
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        System.out.print("Contraseña: ");
+        String contrasenia = scanner.nextLine();
+
+        String rol = "";
+        while (true) {
+            System.out.print("Seleccione su Rol (1: Profesional, 2: Reclutador): ");
+            String opcionRol = scanner.nextLine();
+            if (opcionRol.equals("1")) {
+                rol = "Profesional"; break;
+            }
+            else if (opcionRol.equals("2")) {
+                rol = "Reclutador"; break;
+            }
+            else { System.out.println("[⚠️] Por favor ingrese 1 o 2."); }
+        }
+
+        if (sistema.registrarUsuario(nombre, email, contrasenia, rol)) {
+            System.out.println("[✅] Registro exitoso. ¡Ahora puedes iniciar sesión!");
+        } else {
+            System.out.println("[❌] Falló el registro.");
+        }
+        esperarEnter();
     }
 
     private void ejecutarCargaDeDatos() {
@@ -117,17 +188,15 @@ public class Consola {
         simularEntrada("Ingrese el nombre del usuario: ", "Marcos (Reclutador)");
         simularEntrada("Ingrese el email: ", "marcos@empresa.com");
         simularEntrada("Ingrese la contraseña: ", "1234");
-        simularEntrada("Ingrese el rol (ej. PROFESIONAL, RECLUTADOR): ", "RECLUTADOR");
-        sistema.registrarUsuario("Marcos (Reclutador)", "marcos@empresa.com", "1234", "RECLUTADOR");
-        // El ID será 4 (ya que en SistemaRedSocial se cargan los IDs 1, 2 y 3 al inicio)
+        simularEntrada("Ingrese el rol (ej. PROFESIONAL, RECLUTADOR): ", "Reclutador");
+        sistema.registrarUsuario("Marcos (Reclutador)", "marcos@empresa.com", "1234", "Reclutador");
 
         System.out.println();
         simularEntrada("Ingrese el nombre del usuario: ", "Sofia (Profesional)");
         simularEntrada("Ingrese el email: ", "sofia@mail.com");
         simularEntrada("Ingrese la contraseña: ", "1234");
         simularEntrada("Ingrese el rol (ej. PROFESIONAL, RECLUTADOR): ", "PROFESIONAL");
-        sistema.registrarUsuario("Sofia (Profesional)", "sofia@mail.com", "1234", "PROFESIONAL");
-        // El ID será 5
+        sistema.registrarUsuario("Sofia (Profesional)", "sofia@mail.com", "1234", "Profesional");
 
         imprimirEncabezado("FUNCIÓN 2: INICIAR SESIÓN");
         simularEntrada("Ingrese correo para login: ", "sofia@mail.com");
@@ -135,10 +204,8 @@ public class Consola {
         sistema.iniciarSesion("sofia@mail.com", "1234");
 
         imprimirEncabezado("FUNCIÓN 3: EDITAR PERFIL");
-        simularEntrada("Ingrese el ID del usuario: ", "5");
         simularEntrada("Campo a editar (nombre, profesion, ciudad, resumen): ", "profesion");
         simularEntrada("Ingrese el nuevo valor: ", "Desarrolladora FullStack");
-        sistema.editarPerfil(5, "profesion", "Desarrolladora FullStack");
 
         imprimirEncabezado("FUNCIÓN 4: BUSCAR PERFIL DE USUARIO");
         simularEntrada("Ingrese el ID a buscar: ", "5");
@@ -152,9 +219,8 @@ public class Consola {
         simularEntrada("Ingrese el ID del usuario a deshacer cambio: ", "5");
         sistema.deshacerCambioPerfil(5);
 
-        // Volvemos a editar para que le quede la profesión
         System.out.println("(Rehaciendo edición automáticamente para continuar...)");
-        sistema.editarPerfil(5, "profesion", "Desarrolladora FullStack");
+        sistema.editarPerfilActual(5, "profesion", "Desarrolladora FullStack");
 
         imprimirEncabezado("FUNCIÓN 6: AGREGAR HABILIDAD AL PERFIL");
         simularEntrada("Ingrese el ID del usuario: ", "5");
@@ -204,7 +270,6 @@ public class Consola {
         simularEntrada("Descripción: ", "Se busca dev para proyecto bancario.");
         simularEntrada("Habilidades: ", "Angular, Java");
         sistema.crearOferta(4, "Desarrollador Web SSR", "Se busca dev para proyecto bancario.", "Angular, Java");
-        // Esta será la Oferta 2, porque la inicialización del sistema crea la Oferta 1
 
         imprimirEncabezado("FUNCIÓN 12: POSTULARSE A UNA OFERTA");
         simularEntrada("ID del usuario postulante: ", "5");
@@ -215,33 +280,6 @@ public class Consola {
         esperarEnter();
     }
 
-    private void ejecutarRegistrarUsuario() {
-        while (true) {
-            imprimirEncabezado("REGISTRAR NUEVO USUARIO");
-
-            System.out.print("Ingrese el nombre del usuario: ");
-            String nombre = scanner.nextLine();
-
-            System.out.print("Ingrese el email: ");
-            String email = scanner.nextLine();
-
-            System.out.print("Ingrese la contraseña: ");
-            String contrasenia = scanner.nextLine();
-
-            System.out.print("Ingrese el rol (ej. PROFESIONAL, RECLUTADOR): ");
-            String rol = scanner.nextLine();
-
-            boolean exito = sistema.registrarUsuario(nombre, email, contrasenia, rol);
-
-            if (exito) {
-                System.out.println("\n[✅ ÉXITO] Operación completada.");
-                esperarEnter();
-                return;
-            } else {
-                if (!deseaReintentar()) return;
-            }
-        }
-    }
 
     private void ejecutarBuscarUsuario() {
         while (true) {
@@ -258,28 +296,6 @@ public class Consola {
             } else {
                 if (!deseaReintentar()) return;
                 System.out.println("\n-------------------------------------------------");
-            }
-        }
-    }
-
-    private void ejecutarEditarPerfil() {
-        while (true) {
-            imprimirEncabezado("EDITAR PERFIL");
-            int id = pedirEntero("Ingrese el ID del usuario: ");
-
-            System.out.print("Campo a editar (nombre, profesion, ciudad, resumen): ");
-            String campo = scanner.nextLine();
-
-            System.out.print("Ingrese el nuevo valor: ");
-            String nuevoValor = scanner.nextLine();
-
-            boolean exito = sistema.editarPerfil(id, campo, nuevoValor);
-
-            if (exito) {
-                esperarEnter();
-                return;
-            } else {
-                if (!deseaReintentar()) return;
             }
         }
     }

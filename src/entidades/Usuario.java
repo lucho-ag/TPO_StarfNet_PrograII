@@ -14,10 +14,9 @@ public class Usuario {
     private String rol;
     private boolean activo;
     private PilaCambios historial;
-    private IColaUsuarios solicitudesPendientes; // RF10 — nuevo
+    private IColaUsuarios solicitudesPendientes;
 
-    public Usuario(int id, String nombre, String email,
-                   String contrasenia, String rol) {
+    public Usuario(int id, String nombre, String email, String contrasenia, String rol) {
         this.id = id;
         this.nombre = nombre;
         this.email = email;
@@ -25,7 +24,7 @@ public class Usuario {
         this.rol = rol;
         this.activo = true;
         this.historial = new PilaCambios();
-        this.solicitudesPendientes = new ColaUsuarios(); // RF10 — nuevo
+        this.solicitudesPendientes = new ColaUsuarios();
     }
 
     public int getId() { return id; }
