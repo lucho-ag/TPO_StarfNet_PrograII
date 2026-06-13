@@ -253,7 +253,7 @@ public class SistemaRedSocial {
     }
 
 
-
+/*
     public boolean crearOferta(int idReclutador, String titulo, String descripcion, String habilidades) {
         Usuario u = arbolUsuarios.buscar(idReclutador);
         if (u == null || !u.getRol().equals("RECLUTADOR")) {
@@ -288,6 +288,8 @@ public class SistemaRedSocial {
         }
         return null;
     }
+
+ */
 
     public Usuario getUsuarioActual() {
         return usuarioActual;

@@ -290,12 +290,6 @@ public class Consola {
 
  */
 
-    private void ejecutarDeshacerCambio() {
-        imprimirEncabezado("DESHACER ÚLTIMO CAMBIO");
-        sistema.deshacerUltimoCambio();
-        esperarEnter();
-    }
-
     private void ejecutarAgregarHabilidad() {
         imprimirEncabezado("CATÁLOGO JERÁRQUICO DE HABILIDADES");
         sistema.getArbolHabilidades().mostrarEstructura();
@@ -397,23 +391,6 @@ public class Consola {
                 return Integer.parseInt(entrada);
             } catch (NumberFormatException e) {
                 System.out.println("[❌ ERROR] Entrada inválida. Por favor, introduzca un número entero válido.");
-            }
-        }
-    }
-
-    private boolean deseaReintentar() {
-        while (true) {
-            System.out.println("\n¿Qué desea hacer?");
-            System.out.println("1. Volver a intentar");
-            System.out.println("0. Volver al menú anterior");
-            int opcion = pedirEntero("Opción: ");
-
-            if (opcion == 1) {
-                return true;
-            } else if (opcion == 0) {
-                return false;
-            } else {
-                System.out.println("[⚠️] Opción no válida. Ingrese 1 o 0.");
             }
         }
     }
