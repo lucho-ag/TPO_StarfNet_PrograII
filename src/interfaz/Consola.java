@@ -25,7 +25,8 @@ public class Consola {
                 case 2:
                     ejecutarRegistro(); break;
                 case 3:
-                    ejecutarCargaDeDatos(); break;
+                    // ejecutarCargaDeDatos();
+                    break;
                 case 0:
                     imprimirEncabezado("SALIENDO DEL SISTEMA");
                     System.out.println("¡Gracias por utilizar la aplicación!");
@@ -76,7 +77,7 @@ public class Consola {
             System.out.println("2. Editar mi Perfil");
             System.out.println("3. Deshacer Último Cambio de Perfil (Pila)");
             System.out.println("4. Buscar Empleos");
-            System.out.println("5. Mi Red de Contactos (Sugerencias)");
+            System.out.println("5. Mi Red de Contactos y Networking");
             System.out.println("6. Explorar Catálogo de Habilidades y Agregar");
             System.out.println("0. Cerrar Sesión");
             opcion = pedirEntero("Opción: ");
@@ -98,8 +99,7 @@ public class Consola {
                     esperarEnter();
                     break;
                 case 5:
-                    System.out.println("Próximamente: Sugerencias con Grafos...");
-                    esperarEnter();
+                    ejecutarMiRedDeContactos();
                     break;
                 case 6:
                     ejecutarAgregarHabilidad();
@@ -186,6 +186,7 @@ public class Consola {
         esperarEnter();
     }
 
+/*
     private void ejecutarCargaDeDatos() {
         imprimirEncabezado("INICIANDO SIMULACIÓN DE CARGA DE DATOS");
         System.out.println("El sistema escribirá simulando a un usuario humano.\nSe probarán TODAS las funciones con 2 usuarios nuevos.\n");
@@ -287,25 +288,7 @@ public class Consola {
         esperarEnter();
     }
 
-
-    private void ejecutarBuscarUsuario() {
-        while (true) {
-            imprimirEncabezado("BUSCAR PERFIL DE USUARIO");
-            int id = pedirEntero("Ingrese el ID a buscar: ");
-
-            Usuario usuario = sistema.buscarUsuario(id);
-
-            if (usuario != null) {
-                System.out.println("\n>> PERFIL ENCONTRADO <<");
-                System.out.println(usuario.toString());
-                esperarEnter();
-                return;
-            } else {
-                if (!deseaReintentar()) return;
-                System.out.println("\n-------------------------------------------------");
-            }
-        }
-    }
+ */
 
     private void ejecutarDeshacerCambio() {
         imprimirEncabezado("DESHACER ÚLTIMO CAMBIO");
@@ -335,104 +318,65 @@ public class Consola {
         esperarEnter();
     }
 
-    private void ejecutarEnviarSolicitud() {
-        while (true) {
-            imprimirEncabezado("ENVIAR SOLICITUD DE CONEXIÓN");
-            int idOrigen = pedirEntero("Ingrese su ID (Solicitante): ");
-            int idDestino = pedirEntero("Ingrese el ID a conectar (Receptor): ");
+    private void ejecutarMiRedDeContactos() {
+        int opcion;
+        do {
+            imprimirEncabezado("MÓDULO DE NETWORKING & CONTACTOS");
+            System.out.println("1. Ver mis contactos actuales");
+            System.out.println("2. Ver sugerencias de contactos recomendados");
+            System.out.println("3. Conectar con un nuevo profesional (Por ID único)");
+            System.out.println("4. Calcular grados de separación con otro usuario (BFS)");
+            System.out.println("0. Volver al panel anterior");
+            opcion = pedirEntero("Seleccione una opción: ");
 
-            boolean exito = sistema.enviarSolicitudConexion(idOrigen, idDestino);
+            switch (opcion) {
+                case 1:
+                    imprimirEncabezado("MIS CONTACTOS DIRECTOS");
+                    int[] contactos = sistema.obtenerContactos(sistema.getUsuarioActual().getId());
 
-            if (exito) {
-                esperarEnter();
-                return;
-            } else {
-                if (!deseaReintentar()) return;
+                    if (contactos == null || contactos.length == 0) {
+                        System.out.println("Aún no tienes contactos directos en tu red.");
+                    } else {
+                        System.out.println("Lista de profesionales en tu red:");
+                        for (int idContacto : contactos) {
+                            Usuario c = sistema.getArbolUsuarios().buscar(idContacto);
+                            if (c != null) {
+                                System.out.println("- [ID: " + c.getId() + "] " + c.getNombre() + " | Profesión: " + c.getProfesion());
+                            }
+                        }
+                    }
+                    esperarEnter();
+                    break;
+
+                case 2:
+                    sistema.mostrarContactosRecomendados();
+                    esperarEnter();
+                    break;
+
+                case 3:
+                    imprimirEncabezado("CONECTAR CON UN PROFESIONAL");
+                    int idConectar = pedirEntero("Ingresa el [ID] único del usuario que deseas agregar: ");
+                    sistema.conectarConContacto(idConectar);
+                    esperarEnter();
+                    break;
+
+                case 4:
+                    imprimirEncabezado("CALCULAR GRADOS DE SEPARACIÓN (BFS)");
+                    int idDistancia = pedirEntero("Ingresa el [ID] del profesional para medir la distancia: ");
+                    sistema.mostrarGradosDeSeparacionCon(idDistancia);
+                    esperarEnter();
+                    break;
+
+                case 0:
+                    break;
+
+                default:
+                    System.out.println("[⚠️] Opción inválida.");
+                    esperarEnter();
             }
-        }
+        } while (opcion != 0);
     }
 
-    private void ejecutarProcesarSolicitud() {
-        while (true) {
-            imprimirEncabezado("PROCESAR SOLICITUDES");
-            int idReceptor = pedirEntero("Ingrese su ID (Receptor): ");
-            int idSolicitante = pedirEntero("Ingrese el ID de quien le envió la solicitud: ");
-
-            System.out.print("¿Desea aceptar la solicitud? (S/N): ");
-            String respuesta = scanner.nextLine();
-            boolean aceptar = respuesta.equalsIgnoreCase("S");
-
-            boolean exito = sistema.procesarConexion(idReceptor, idSolicitante, aceptar);
-
-            if (exito) {
-                esperarEnter();
-                return;
-            } else {
-                if (!deseaReintentar()) return;
-            }
-        }
-    }
-
-    private void ejecutarVerContactos() {
-        while (true) {
-            imprimirEncabezado("LISTA DE CONTACTOS");
-            int id = pedirEntero("Ingrese el ID del usuario: ");
-
-            int[] contactos = sistema.obtenerContactos(id);
-
-            if (contactos == null) {
-                if (!deseaReintentar()) return;
-                continue;
-            }
-
-            System.out.println("\nContactos del ID: " + id);
-            System.out.println("-------------------------------------------------");
-            if (contactos.length == 0) {
-                System.out.println("Este usuario aún no tiene contactos agregados.");
-            } else {
-                for (int idContacto : contactos) {
-                    Usuario amigo = sistema.buscarUsuario(idContacto);
-                    String nombreAmigo = (amigo != null) ? amigo.getNombre() : "Usuario Desconocido";
-                    System.out.println(" • ID: " + idContacto + " -> " + nombreAmigo);
-                }
-            }
-            System.out.println("-------------------------------------------------");
-            esperarEnter();
-            return;
-        }
-    }
-
-    private void ejecutarCalcularGrados() {
-        while (true) {
-            imprimirEncabezado("CALCULAR GRADOS DE SEPARACIÓN");
-            int idOrigen = pedirEntero("Ingrese el ID del usuario origen: ");
-            int idDestino = pedirEntero("Ingrese el ID del usuario destino: ");
-
-            int grados = sistema.calcularGradosDeSeparacion(idOrigen, idDestino);
-
-            if (grados == -2) {
-                System.out.println("[❌ ERROR] Uno o ambos usuarios no existen.");
-                if (!deseaReintentar()) return;
-                continue;
-            }
-
-            System.out.println("\n>> ANÁLISIS DE RED <<");
-            System.out.println("-------------------------------------------------");
-            if (grados == 0) {
-                System.out.println("Estás consultando el mismo usuario.");
-            } else if (grados == -1) {
-                System.out.println("No existe ninguna ruta o conexión entre estos usuarios.");
-            } else if (grados == 1) {
-                System.out.println("Son contactos directos (1 grado de separación).");
-            } else {
-                System.out.println("Están conectados a través de " + grados + " grados de separación.");
-                System.out.println("(Se necesitan " + (grados - 1) + " intermediario/s para conectar los perfiles).");
-            }
-            System.out.println("-------------------------------------------------");
-            esperarEnter();
-            return;
-        }
-    }
 
     private void simularEntrada(String mensaje, String valorSimulado) {
         System.out.print(mensaje);

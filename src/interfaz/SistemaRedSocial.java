@@ -116,65 +116,143 @@ public class SistemaRedSocial {
         return true;
     }
 
-    public Usuario buscarUsuario(int id) {
-        Usuario u = arbolUsuarios.buscar(id);
-        if (u == null || !u.isActivo()) {
-            System.out.println("Perfil no encontrado.");
-            return null;
+    public void conectarConContacto(int idDestino) {
+        if (this.usuarioActual == null) {
+            System.out.println("[❌] Error: Debes iniciar sesión primero.");
+            return;
         }
-        return u;
-    }
 
-    public boolean enviarSolicitudConexion(int idOrigen, int idDestino) {
-        if (!arbolUsuarios.existe(idOrigen) || !arbolUsuarios.existe(idDestino)) {
-            System.out.println("Uno o ambos usuarios no existen.");
-            return false;
-        }
-        if (idOrigen == idDestino) {
-            System.out.println("No podés enviarte una solicitud a vos mismo.");
-            return false;
-        }
-        if (grafoContactos.existeArista(idOrigen, idDestino)) {
-            System.out.println("Ya son contactos.");
-            return false;
-        }
         Usuario destino = arbolUsuarios.buscar(idDestino);
-        destino.getSolicitudesPendientes().encolar(idOrigen);
-        System.out.println("Solicitud enviada correctamente.");
-        return true;
+        if (destino == null) {
+            System.out.println("[❌] No se encontró ningún profesional con el ID " + idDestino + ".");
+            return;
+        }
+
+        int miId = this.usuarioActual.getId();
+
+        if (miId == idDestino) {
+            System.out.println("[⚠️] No puedes agregarte a ti mismo como contacto.");
+            return;
+        }
+
+        if (grafoContactos.existeArista(miId, idDestino)) {
+            System.out.println("[⚠️] Ya estás conectado con " + destino.getNombre() + ".");
+            return;
+        }
+
+        grafoContactos.agregarArista(miId, idDestino);
+        System.out.println("[✅] ¡Conexión exitosa! Ahora estás conectado con " + destino.getNombre() + ".");
     }
 
-    public boolean procesarConexion(int idReceptor, int idSolicitante, boolean aceptar) {
-        Usuario receptor = arbolUsuarios.buscar(idReceptor);
-        if (receptor == null) {
-            System.out.println("Usuario no encontrado.");
-            return false;
+    public void mostrarGradosDeSeparacionCon(int idDestino) {
+        if (this.usuarioActual == null) return;
+
+        Usuario destino = arbolUsuarios.buscar(idDestino);
+        if (destino == null) {
+            System.out.println("[❌] No se encontró al profesional con ID " + idDestino + ".");
+            return;
         }
-        IColaUsuarios aux = new ColaUsuarios();
-        boolean encontrado = false;
-        while (!receptor.getSolicitudesPendientes().estaVacia()) {
-            int id = receptor.getSolicitudesPendientes().desencolar();
-            if (id == idSolicitante) {
-                encontrado = true;
-            } else {
-                aux.encolar(id);
+
+        int pasos = grafoContactos.calcularGradosDeSeparacion(this.usuarioActual.getId(), idDestino);
+
+        if (pasos == -1) {
+            System.out.println("[ℹ️] Distancia Infinita: No hay caminos que te conecten con " + destino.getNombre() + ".");
+        } else if (pasos == 1) {
+            System.out.println("[ℹ️] " + destino.getNombre() + " es tu contacto directo (1er grado).");
+        } else {
+            System.out.println("[ℹ️] Hay " + pasos + " grados de separación entre tú y " + destino.getNombre() + ".");
+        }
+    }
+
+    public void mostrarContactosRecomendados() {
+        if (this.usuarioActual == null) return;
+
+        int miId = this.usuarioActual.getId();
+        int[] misContactos = grafoContactos.obtenerContactos(miId);
+
+        if (misContactos == null || misContactos.length == 0) {
+            System.out.println("[ℹ️] Tu red está vacía. Aquí tienes algunos colegas de tu rubro para romper el hielo:");
+            sugerirPlanBPorAfinidad();
+            return;
+        }
+
+        System.out.println("\n--- 👥 PROFESIONALES RECOMENDADOS ---");
+        boolean huboSugerencias = false;
+
+        ConjuntoUsuarios misAmigos = new ConjuntoUsuarios();
+        for (int id : misContactos) {
+            misAmigos.insertar(id);
+        }
+
+        ConjuntoUsuarios yaSugeridos = new ConjuntoUsuarios();
+
+        for (int idAmigo : misContactos) {
+            int[] contactosDelAmigo = grafoContactos.obtenerContactos(idAmigo);
+            if (contactosDelAmigo == null) continue;
+
+            for (int idSugerido : contactosDelAmigo) {
+
+                if (idSugerido != miId && !misAmigos.pertenece(idSugerido) && !yaSugeridos.pertenece(idSugerido)) {
+
+                    yaSugeridos.insertar(idSugerido);
+
+                    ConjuntoUsuarios amigosDelSugerido = new ConjuntoUsuarios();
+                    int[] arrayAmigosSugerido = grafoContactos.obtenerContactos(idSugerido);
+                    for (int id : arrayAmigosSugerido) {
+                        amigosDelSugerido.insertar(id);
+                    }
+
+                    ConjuntoUsuarios mutuos = misAmigos.interseccion(amigosDelSugerido);
+
+                    Usuario usuarioSugerido = arbolUsuarios.buscar(idSugerido);
+                    if (usuarioSugerido != null) {
+                        System.out.println("-> [ID: " + usuarioSugerido.getId() + "] " + usuarioSugerido.getNombre() +
+                                " | Profesión: " + usuarioSugerido.getProfesion() +
+                                " | Amigos en común: " + mutuos.tamanio());
+                        huboSugerencias = true;
+                    }
+                }
             }
         }
-        while (!aux.estaVacia()) {
-            receptor.getSolicitudesPendientes().encolar(aux.desencolar());
+
+        if (!huboSugerencias) {
+            System.out.println("Has conectado con toda tu red cercana. ¡Busca nuevas personas por ID!");
         }
-        if (!encontrado) {
-            System.out.println("No existe esa solicitud pendiente.");
-            return false;
-        }
-        if (aceptar) {
-            grafoContactos.agregarArista(idReceptor, idSolicitante);
-            System.out.println("Conexión aceptada. ¡Ahora son contactos!");
-        } else {
-            System.out.println("Solicitud rechazada.");
-        }
-        return true;
+        System.out.println("-------------------------------------------------------");
     }
+
+    private void sugerirPlanBPorAfinidad() {
+        int cantSugeridos = 0;
+        String miProfesion = this.usuarioActual.getProfesion();
+
+        for (int i = 0; i < cantidadUsuarios; i++) {
+            Usuario otro = arbolUsuarios.buscar(todosLosIds[i]);
+
+            if (otro != null && otro.getId() != this.usuarioActual.getId()) {
+                if (otro.getProfesion().equalsIgnoreCase(miProfesion) && !otro.getProfesion().equals("-")) {
+                    System.out.println("-> [ID: " + otro.getId() + "] " + otro.getNombre() + " | Colega en: " + miProfesion);
+                    cantSugeridos++;
+                }
+            }
+
+            if (cantSugeridos == 5) break;
+        }
+
+        if (cantSugeridos == 0) {
+            System.out.println("No encontramos colegas de tu rubro exacto, ¡explora la red conociendo gente nueva!");
+        }
+    }
+
+    public int[] obtenerContactos(int idUsuario) {
+        Usuario u = arbolUsuarios.buscar(idUsuario);
+        if (u == null) {
+            return new int[0];
+        }
+
+        return grafoContactos.obtenerContactos(idUsuario);
+    }
+
+
 
     public boolean crearOferta(int idReclutador, String titulo, String descripcion, String habilidades) {
         Usuario u = arbolUsuarios.buscar(idReclutador);
@@ -254,13 +332,8 @@ public class SistemaRedSocial {
         return arbolHabilidades;
     }
 
-    public int[] obtenerContactos(int idUsuario) {
-        if (buscarUsuario(idUsuario) == null) return null;
-        return grafoContactos.obtenerContactos(idUsuario);
+    public IArbolUsuariosAVL getArbolUsuarios() {
+        return arbolUsuarios;
     }
 
-    public int calcularGradosDeSeparacion(int idOrigen, int idDestino) {
-        if (buscarUsuario(idOrigen) == null || buscarUsuario(idDestino) == null) return -2;
-        return grafoContactos.calcularGradosDeSeparacion(idOrigen, idDestino);
-    }
 }

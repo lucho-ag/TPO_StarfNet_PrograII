@@ -85,7 +85,10 @@ public class GrafoConexiones implements IGrafoConexiones{
     @Override
     public int[] obtenerContactos(int idUsuario) {
         NodoVertice vertice = buscarVertice(idUsuario);
-        if (vertice == null || vertice.aristas == null) return new int[0];
+
+        if (vertice == null || vertice.aristas == null) {
+            return new int[0];
+        }
 
         int cantidad = 0;
         NodoArista aux = vertice.aristas;
@@ -97,8 +100,10 @@ public class GrafoConexiones implements IGrafoConexiones{
         int[] contactos = new int[cantidad];
         aux = vertice.aristas;
         int i = 0;
+
         while (aux != null) {
-            contactos[i++] = aux.idDestino;
+            contactos[i] = aux.idDestino;
+            i++;
             aux = aux.sig;
         }
 
