@@ -1,46 +1,74 @@
 package estructurasTDA;
 
 public class ConjuntoUsuarios implements IConjuntoUsuarios {
-    private int[] elementos;
+    private int[] datos;
     private int cantidad;
+    private final int MAX = 200;
 
     public ConjuntoUsuarios() {
-        this.elementos = new int[100]; // dinámico si querés
+        this.datos = new int[MAX];
         this.cantidad = 0;
     }
 
-    @Override
     public void insertar(int elemento) {
+        if (cantidad == MAX) {
+            System.out.println("Conjunto lleno");
+            return;
+        }
         if (!pertenece(elemento)) {
-            elementos[cantidad++] = elemento;
+            datos[cantidad] = elemento;
+            cantidad++;
         }
     }
 
-    @Override
     public void eliminar(int elemento) {
+        int pos = -1;
         for (int i = 0; i < cantidad; i++) {
-            if (elementos[i] == elemento) {
-                elementos[i] = elementos[--cantidad];
-                return;
+            if (datos[i] == elemento) {
+                pos = i;
+                break;
             }
         }
+        if (pos != -1) {
+            for (int i = pos; i < cantidad - 1; i++) {
+                datos[i] = datos[i + 1];
+            }
+            cantidad--;
+        }
     }
 
-    @Override
     public boolean pertenece(int elemento) {
         for (int i = 0; i < cantidad; i++) {
-            if (elementos[i] == elemento) return true;
+            if (datos[i] == elemento) {
+                return true;
+            }
         }
         return false;
     }
 
-    @Override
-    public boolean estaVacio() { return cantidad == 0; }
+    public boolean estaVacio() {
+        return cantidad == 0;
+    }
 
-    // Método extra que necesitás para RF13 (no está en la interface pero lo usás internamente)
-    public int[] obtenerElementos() {
-        int[] resultado = new int[cantidad];
-        for (int i = 0; i < cantidad; i++) resultado[i] = elementos[i];
-        return resultado;
+    public int tamanio() {
+        return cantidad;
+    }
+
+    public int[] obtenerDatos() {
+        int[] copia = new int[cantidad];
+        for (int i = 0; i < cantidad; i++) {
+            copia[i] = datos[i];
+        }
+        return copia;
+    }
+
+    public ConjuntoUsuarios interseccion(ConjuntoUsuarios B) {
+        ConjuntoUsuarios C = new ConjuntoUsuarios();
+        for (int i = 0; i < this.cantidad; i++) {
+            if (B.pertenece(this.datos[i])) {
+                C.insertar(this.datos[i]);
+            }
+        }
+        return C;
     }
 }
