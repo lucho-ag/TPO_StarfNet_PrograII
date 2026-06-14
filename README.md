@@ -2,6 +2,7 @@
 
 **Integrantes del grupo:** Agostino Luciano, Ielpi Facundo, Luca Vilajosana Juan  
 **Alternativa elegida:** Ecosistema de Red Social Profesional  
+**Link del Repositorio:** https://github.com/lucho-ag/TPO_StarfNet_PrograII.git
 
 ---
 
@@ -53,3 +54,40 @@ El programa abarca todo el ciclo de interacción de una red social laboral, divi
 * **Agostino Luciano:** Responsable de la arquitectura base del proyecto mediante la implementación de las estructuras de datos fundamentales como el Grafo de conexiones y la Cola de usuarios. Se encargó de la creación del Árbol AVL para la gestión de usuarios, definió las interfaces críticas del sistema y realizó actualizaciones de los métodos de búsqueda, la lógica de conexiones y el método de intersección de conjuntos.
 * **Ielpi Facundo:** Creación y configuración del archivo README del proyecto. Desarrolló la implementación técnica de la interfaz de la consola, asegurando la interacción fluida del usuario. Fue responsable de la configuración del archivo principal (main), la integración de la carga de datos del modelo, los cambios estructurales en la clase Usuario y la sincronización general del sistema mediante múltiples merges de ramas.
 * **Luca Vilajosana Juan:** Responsable de la estructuración de las entidades del dominio como `Habilidad` y `PerfilEstado`. Implementó la clase `Usuario` y consolidó el `SistemaRedSocial`, junto con el desarrollo de la `PilaCambios` y sus nodos, asegurando la integridad de las estructuras de datos y su correcta integración con las interfaces del programa.
+
+## Jerarquia del Proyecto
+
+``` 
+├── 📁 .idea/                
+├── 📁 out/               
+├── 📁 src/                  
+│   ├── 📁 entidades/       
+│   │   ├── 📄 Habilidad.java
+│   │   ├── 📄 Oferta.java
+│   │   ├── 📄 PerfilEstado.java
+│   │   └── 📄 Usuario.java
+│   │
+│   ├── 📁 estructurasTDA/    
+│   │   ├── 📄 ArbolHabilidades.java
+│   │   ├── 📄 ArbolUsuariosAVL.java
+│   │   ├── 📄 ColaUsuarios.java
+│   │   ├── 📄 Conjunto.java
+│   │   ├── 📄 GrafoConexiones.java
+│   │   ├── 📄 IArbolHabilidades.java
+│   │   ├── 📄 IArbolUsuariosAVL.java
+│   │   ├── 📄 IColaUsuarios.java
+│   │   ├── 📄 IGrafoConexiones.java
+│   │   ├── 📄 NodoArbolHabilidades.java
+│   │   ├── 📄 NodoAVL.java
+│   │   ├── 📄 NodoCola.java
+│   │   ├── 📄 NodoGrafo.java
+│   │   ├── 📄 NodoListaEnlazada.java
+│   │   ├── 📄 NodoPila.java
+│   │   └── 📄 PilaCambios.java
+│   │
+│   └── 📁 interfaz/         
+│       ├── 📄 Consola.java
+│       ├── 📄 Main.java
+│       ├── 📄 SistemaRedSocial.java
+│       └── 📄 TesterAutomatizado.java
+```
