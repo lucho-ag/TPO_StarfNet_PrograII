@@ -43,6 +43,7 @@ El programa abarca todo el ciclo de interacción de una red social laboral, divi
 ### Bolsa de Trabajo
 * **Creación de ofertas:** Opción exclusiva para los reclutadores, quienes pueden publicar anuncios con descripciones y habilidades requeridas.
 * **Postulaciones:** Los profesionales pueden ver un listado de las ofertas activas publicadas por su red de contactos y enviar su postulación formal.
+* **Orden de llegada:** El reclutador puede aceptar a los postulantes por orden de llegada (TDA COLA).
 
 ### Simulación Automática
 * **Prueba de integración:** El sistema incluye un modo de "Prueba Automática" en el menú principal que ejecuta de forma secuencial un recorrido completo por todas las opciones. Esto simula la interacción real entre un reclutador y un profesional para verificar el correcto funcionamiento de todos los módulos sin necesidad de cargar los datos de forma manual.
@@ -52,7 +53,7 @@ El programa abarca todo el ciclo de interacción de una red social laboral, divi
 ## Contribuciones del equipo
 
 * **Agostino Luciano:** Responsable de la arquitectura base del proyecto mediante la implementación de las estructuras de datos fundamentales como el Grafo de conexiones y la Cola de usuarios. Se encargó de la creación del Árbol AVL y Árbol N-ario para la gestión de usuarios y habilidades respectivamente, definió las interfaces críticas del sistema y realizó actualizaciones de los métodos de búsqueda, la lógica de conexiones, el método de intersección de conjuntos para los contactos recomendados y actualizó la reclutación y aceptación de ofertas laborales.
-* **Ielpi Facundo:** Creación y configuración del archivo README del proyecto. Desarrolló la implementación técnica de la interfaz de la consola, asegurando la interacción fluida del usuario. Fue responsable de la configuración del archivo principal (main), la integración de la carga de datos del modelo, los cambios estructurales en la clase Usuario y la sincronización general del sistema mediante múltiples merges de ramas.
+* **Ielpi Facundo:** Creación y configuración del archivo README del proyecto. Desarrolló la implementación técnica de la interfaz de la consola, asegurando la interacción fluida del usuario. Fue responsable de la configuración del archivo principal (main), la integración de la carga de datos del modelo, los cambios estructurales en la clase Usuario y la sincronización general del sistema mediante múltiples merges de ramas. Además, contribuyó en las continuas actualizaciones de las entidades y estructuras.
 * **Luca Vilajosana Juan:** Responsable de la estructuración de las entidades del dominio como `Habilidad` y `PerfilEstado`. Implementó la clase `Usuario` y consolidó el `SistemaRedSocial`, junto con el desarrollo de la `PilaCambios` y sus nodos, asegurando la integridad de las estructuras de datos y su correcta integración con las interfaces del programa.
 
 ## Jerarquia del Proyecto
