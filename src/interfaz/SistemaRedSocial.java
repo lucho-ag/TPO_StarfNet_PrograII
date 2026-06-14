@@ -353,6 +353,32 @@ public class SistemaRedSocial {
         return null;
     }
 
+    public Oferta[] obtenerTodasLasOfertas() {
+        return this.ofertas;
+    }
+
+    public int getCantidadOfertas() {
+        return this.cantidadOfertas;
+    }
+
+    public Oferta obtenerOfertaPropia(int idOferta) {
+        if (this.usuarioActual == null || !this.usuarioActual.getRol().equals("RECLUTADOR")) {
+            return null;
+        }
+        Oferta o = buscarOferta(idOferta);
+        if (o != null && o.getIdReclutador() == this.usuarioActual.getId()) {
+            return o;
+        }
+        return null;
+    }
+
+    public void cerrarOferta(int idOferta) {
+        Oferta o = obtenerOfertaPropia(idOferta);
+        if (o != null) {
+            o.cerrar();
+        }
+    }
+
     public Usuario getUsuarioActual() {
         return usuarioActual;
     }
