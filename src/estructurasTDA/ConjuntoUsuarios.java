@@ -1,73 +1,85 @@
 package estructurasTDA;
 
 public class ConjuntoUsuarios implements IConjuntoUsuarios {
-    private int[] datos;
-    private int cantidad;
-    private final int MAX = 200;
+    private NodoConjunto cabeza;
 
     public ConjuntoUsuarios() {
-        this.datos = new int[MAX];
-        this.cantidad = 0;
+        this.cabeza = null;
     }
 
+    @Override
     public void insertar(int elemento) {
-        if (cantidad == MAX) {
-            System.out.println("Conjunto lleno");
+        if (!pertenece(elemento)) {
+            NodoConjunto nuevo = new NodoConjunto(elemento);
+            nuevo.sig = cabeza;
+            cabeza = nuevo;
+        }
+    }
+
+    @Override
+    public void eliminar(int elemento) {
+        if (cabeza == null) return;
+        if (cabeza.dato == elemento) {
+            cabeza = cabeza.sig;
             return;
         }
-        if (!pertenece(elemento)) {
-            datos[cantidad] = elemento;
-            cantidad++;
+        NodoConjunto actual = cabeza;
+        while (actual.sig != null) {
+            if (actual.sig.dato == elemento) {
+                actual.sig = actual.sig.sig;
+                return;
+            }
+            actual = actual.sig;
         }
     }
 
-    public void eliminar(int elemento) {
-        int pos = -1;
-        for (int i = 0; i < cantidad; i++) {
-            if (datos[i] == elemento) {
-                pos = i;
-                break;
-            }
-        }
-        if (pos != -1) {
-            for (int i = pos; i < cantidad - 1; i++) {
-                datos[i] = datos[i + 1];
-            }
-            cantidad--;
-        }
-    }
-
+    @Override
     public boolean pertenece(int elemento) {
-        for (int i = 0; i < cantidad; i++) {
-            if (datos[i] == elemento) {
+        NodoConjunto actual = cabeza;
+        while (actual != null) {
+            if (actual.dato == elemento) {
                 return true;
             }
+            actual = actual.sig;
         }
         return false;
     }
 
+    @Override
     public boolean estaVacio() {
-        return cantidad == 0;
+        return cabeza == null;
     }
 
     public int tamanio() {
-        return cantidad;
+        int cant = 0;
+        NodoConjunto actual = cabeza;
+        while (actual != null) {
+            cant++;
+            actual = actual.sig;
+        }
+        return cant;
     }
 
     public int[] obtenerDatos() {
-        int[] copia = new int[cantidad];
-        for (int i = 0; i < cantidad; i++) {
-            copia[i] = datos[i];
+        int cant = tamanio();
+        int[] copia = new int[cant];
+        NodoConjunto actual = cabeza;
+        int i = 0;
+        while (actual != null) {
+            copia[i++] = actual.dato;
+            actual = actual.sig;
         }
         return copia;
     }
 
     public ConjuntoUsuarios interseccion(ConjuntoUsuarios B) {
         ConjuntoUsuarios C = new ConjuntoUsuarios();
-        for (int i = 0; i < this.cantidad; i++) {
-            if (B.pertenece(this.datos[i])) {
-                C.insertar(this.datos[i]);
+        NodoConjunto actual = this.cabeza;
+        while (actual != null) {
+            if (B.pertenece(actual.dato)) {
+                C.insertar(actual.dato);
             }
+            actual = actual.sig;
         }
         return C;
     }

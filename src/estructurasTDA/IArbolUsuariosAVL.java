@@ -7,4 +7,5 @@ public interface IArbolUsuariosAVL {
     Usuario buscar(int id);
     void eliminar(int id);
     boolean existe(int id);
+    Usuario[] obtenerTodos();
 }

@@ -9,8 +9,6 @@ public class SistemaRedSocial {
     private IGrafoConexiones grafoContactos;
     private ArbolHabilidades arbolHabilidades;
 
-    private int[] todosLosIds;
-    private int cantidadUsuarios;
     private int proximoIdUsuario;
 
     private Oferta[] ofertas;
@@ -22,8 +20,6 @@ public class SistemaRedSocial {
     public SistemaRedSocial() {
         this.arbolUsuarios = new ArbolUsuariosAVL();
         this.grafoContactos = new GrafoConexiones();
-        this.todosLosIds = new int[500];
-        this.cantidadUsuarios = 0;
         this.proximoIdUsuario = 1;
         this.ofertas = new Oferta[200];
         this.cantidadOfertas = 0;
@@ -34,8 +30,8 @@ public class SistemaRedSocial {
     }
 
     public boolean registrarUsuario(String nombreUsuario, String nombre, String email, String contrasenia, String rol) {
-        for (int i = 0; i < cantidadUsuarios; i++) {
-            Usuario u = arbolUsuarios.buscar(todosLosIds[i]);
+        Usuario[] todos = arbolUsuarios.obtenerTodos();
+        for (Usuario u : todos) {
             if (u != null && (u.getEmail().equalsIgnoreCase(email) || u.getNombreUsuario().equalsIgnoreCase(nombreUsuario))) {
                 System.out.println("[❌] Error: ya existe una cuenta con ese email o nombre de usuario.");
                 return false;
@@ -45,14 +41,13 @@ public class SistemaRedSocial {
         Usuario nuevo = new Usuario(nuevoId, nombreUsuario, nombre, email, contrasenia, rol);
         arbolUsuarios.insertar(nuevoId, nuevo);
         grafoContactos.agregarVertice(nuevoId);
-        todosLosIds[cantidadUsuarios++] = nuevoId;
         System.out.println("[✅] Cuenta registrada exitosamente.");
         return true;
     }
 
     public boolean iniciarSesion(String email, String contrasenia) {
-        for (int i = 0; i < cantidadUsuarios; i++) {
-            Usuario u = arbolUsuarios.buscar(todosLosIds[i]);
+        Usuario[] todos = arbolUsuarios.obtenerTodos();
+        for (Usuario u : todos) {
             if (u != null && u.getEmail().equalsIgnoreCase(email)) {
                 if (u.validarContrasenia(contrasenia)) {
                     this.usuarioActual = u;
@@ -72,8 +67,8 @@ public class SistemaRedSocial {
     }
 
     public Usuario buscarUsuarioPorNombreUsuario(String nombreUsuario) {
-        for (int i = 0; i < cantidadUsuarios; i++) {
-            Usuario u = arbolUsuarios.buscar(todosLosIds[i]);
+        Usuario[] todos = arbolUsuarios.obtenerTodos();
+        for (Usuario u : todos) {
             if (u != null && u.getNombreUsuario().equalsIgnoreCase(nombreUsuario) && u.isActivo()) {
                 return u;
             }
@@ -260,10 +255,9 @@ public class SistemaRedSocial {
     private void sugerirPlanBPorAfinidad() {
         int cantSugeridos = 0;
         String miProfesion = this.usuarioActual.getProfesion();
+        Usuario[] todos = arbolUsuarios.obtenerTodos();
 
-        for (int i = 0; i < cantidadUsuarios; i++) {
-            Usuario otro = arbolUsuarios.buscar(todosLosIds[i]);
-
+        for (Usuario otro : todos) {
             if (otro != null && otro.isActivo() && otro.getId() != this.usuarioActual.getId()) {
                 if (otro.getProfesion().equalsIgnoreCase(miProfesion) && !otro.getProfesion().equals("-")) {
                     System.out.println("-> @" + otro.getNombreUsuario() + " (" + otro.getNombre() + ") | Colega en: " + miProfesion);

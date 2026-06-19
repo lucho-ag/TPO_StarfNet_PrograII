@@ -93,18 +93,8 @@ public class ArbolUsuariosAVL implements IArbolUsuariosAVL {
             raiz.derecho = eliminarRecursivo(raiz.derecho, id);
         } else {
             if ((raiz.izquierdo == null) || (raiz.derecho == null)) {
-                NodoArbolUsuarios temp = null;
-                if (temp == raiz.izquierdo) {
-                    temp = raiz.derecho;
-                } else {
-                    temp = raiz.izquierdo;
-                }
-
-                if (temp == null) {
-                    raiz = null;
-                } else {
-                    raiz = temp;
-                }
+                NodoArbolUsuarios temp = (raiz.izquierdo != null) ? raiz.izquierdo : raiz.derecho;
+                raiz = temp;
             } else {
                 NodoArbolUsuarios temp = nodoMinimo(raiz.derecho);
                 raiz.clave = temp.clave;
@@ -181,6 +171,27 @@ public class ArbolUsuariosAVL implements IArbolUsuariosAVL {
             actual = actual.izquierdo;
         }
         return actual;
+    }
+
+    @Override
+    public Usuario[] obtenerTodos() {
+        int cantidad = contarNodos(raiz);
+        Usuario[] todos = new Usuario[cantidad];
+        int[] index = {0};
+        recorrerInorden(raiz, todos, index);
+        return todos;
+    }
+
+    private int contarNodos(NodoArbolUsuarios nodo) {
+        if (nodo == null) return 0;
+        return 1 + contarNodos(nodo.izquierdo) + contarNodos(nodo.derecho);
+    }
+
+    private void recorrerInorden(NodoArbolUsuarios nodo, Usuario[] todos, int[] index) {
+        if (nodo == null) return;
+        recorrerInorden(nodo.izquierdo, todos, index);
+        todos[index[0]++] = nodo.valor;
+        recorrerInorden(nodo.derecho, todos, index);
     }
 
 }
