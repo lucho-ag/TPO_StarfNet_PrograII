@@ -94,4 +94,40 @@ public class ArbolHabilidades implements IArbolHabilidades {
 
         return buscarNodoPorNombre(nodo.hermano, nombre);
     }
+
+    @Override
+    public Habilidad[] obtenerHijosDirectos(String nombreCategoria) {
+        NodoArbolHabilidades nodo = buscarNodoPorNombre(raiz, nombreCategoria);
+        if (nodo == null || nodo.primerHijo == null) {
+            return new Habilidad[0];
+        }
+
+        int count = 0;
+        NodoArbolHabilidades aux = nodo.primerHijo;
+        while (aux != null) {
+            count++;
+            aux = aux.hermano;
+        }
+
+        Habilidad[] hijos = new Habilidad[count];
+        aux = nodo.primerHijo;
+        int i = 0;
+        while (aux != null) {
+            hijos[i++] = aux.habilidad;
+            aux = aux.hermano;
+        }
+        return hijos;
+    }
+
+    @Override
+    public boolean esDescendienteOIgual(String nombreAncestro, String nombreHijo) {
+        if (nombreAncestro == null || nombreHijo == null) return false;
+        if (nombreAncestro.trim().equalsIgnoreCase(nombreHijo.trim())) return true;
+
+        NodoArbolHabilidades ancestro = buscarNodoPorNombre(raiz, nombreAncestro);
+        if (ancestro == null) return false;
+
+        NodoArbolHabilidades nodoHijo = buscarNodoPorNombre(ancestro.primerHijo, nombreHijo);
+        return nodoHijo != null;
+    }
 }

@@ -65,6 +65,8 @@ public class Usuario {
     public String getProfesion() { return profesion != null ? profesion : "-"; }
     public String getCiudad() { return ciudad != null ? ciudad : "-"; }
     public String getResumen() { return resumen != null ? resumen : "-"; }
+    public Habilidad[] getMisHabilidades() { return misHabilidades; }
+    public int getCantHabilidades() { return cantHabilidades; }
 
     public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
     public void setNombre(String nombre) { this.nombre = nombre; }

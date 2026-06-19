@@ -1,6 +1,7 @@
 package interfaz;
 
 import entidades.*;
+import estructurasTDA.ArbolHabilidades;
 
 public class Consola {
 
@@ -82,6 +83,7 @@ public class Consola {
             System.out.println("10. Postularse a una Oferta de Trabajo");
             System.out.println("11. Cerrar Sesión");
             System.out.println("12. Eliminar Cuenta");
+            System.out.println("13. Buscar Profesionales por Habilidad");
             System.out.println("-------------------------------------------------");
             opcion = pedirEntero("Seleccione una opción: ");
             System.out.println();
@@ -109,6 +111,7 @@ public class Consola {
                         return;
                     }
                     break;
+                case 13: ejecutarBuscarProfesionalesPorHabilidad(); break;
                 default:
                     System.out.println("[⚠️] Opción no válida.");
                     esperarEnter();
@@ -131,6 +134,7 @@ public class Consola {
             System.out.println("9. Evaluar Postulantes Oferta");
             System.out.println("10. Cerrar Sesión");
             System.out.println("11. Eliminar Cuenta");
+            System.out.println("12. Buscar Profesionales por Habilidad");
             System.out.println("-------------------------------------------------");
             opcion = pedirEntero("Seleccione una opción: ");
             System.out.println();
@@ -157,6 +161,7 @@ public class Consola {
                         return;
                     }
                     break;
+                case 12: ejecutarBuscarProfesionalesPorHabilidad(); break;
                 default:
                     System.out.println("[⚠️] Opción no válida.");
                     esperarEnter();
@@ -166,14 +171,10 @@ public class Consola {
 
     private void ejecutarCrearCuenta() {
         imprimirEncabezado("CREAR CUENTA NUEVA");
-        System.out.print("Nombre de usuario (único, sin @): ");
-        String nombreUsuario = scanner.nextLine();
-        System.out.print("Nombre personal completo: ");
-        String nombre = scanner.nextLine();
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-        System.out.print("Contraseña: ");
-        String contrasenia = scanner.nextLine();
+        String nombreUsuario = pedirNombreUsuario();
+        String nombre = pedirTextoObligatorio("Nombre personal completo: ");
+        String email = pedirEmail();
+        String contrasenia = pedirTextoObligatorio("Contraseña: ");
 
         int tipo = 0;
         do {
@@ -190,16 +191,18 @@ public class Consola {
         String rol = (tipo == 2) ? "RECLUTADOR" : "PROFESIONAL";
 
         if (sistema.registrarUsuario(nombreUsuario, nombre, email, contrasenia, rol)) {
+            System.out.println("[✅] ¡Registro exitoso! Ya puedes iniciar sesión.");
+            esperarEnter();
+        } else {
+            System.out.println("[❌] Falló el registro. Intenta nuevamente.");
             esperarEnter();
         }
     }
 
     private boolean ejecutarIniciarSesion() {
         imprimirEncabezado("INICIAR SESIÓN");
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-        System.out.print("Contraseña: ");
-        String contrasenia = scanner.nextLine();
+        String email = pedirEmail();
+        String contrasenia = pedirTextoObligatorio("Contraseña: ");
 
         if (sistema.iniciarSesion(email, contrasenia)) {
             if (!sistema.getUsuarioActual().isActivo()) {
@@ -231,8 +234,7 @@ public class Consola {
 
     private void ejecutarBuscarUsuario() {
         imprimirEncabezado("BUSCAR PERFIL DE USUARIO");
-        System.out.print("Ingrese el nombre de usuario exacto a buscar (sin @): ");
-        String nombreUsuario = scanner.nextLine();
+        String nombreUsuario = pedirNombreUsuario("Ingrese el nombre de usuario exacto a buscar (sin @): ");
         Usuario usuario = sistema.buscarUsuarioPorNombreUsuario(nombreUsuario);
 
         if (usuario != null) {
@@ -244,6 +246,27 @@ public class Consola {
         esperarEnter();
     }
 
+    private void ejecutarBuscarProfesionalesPorHabilidad() {
+        imprimirEncabezado("BUSCAR PROFESIONALES POR HABILIDAD");
+        String habilidadBuscada = pedirTextoObligatorio("Ingrese la habilidad a buscar (se incluirán especialidades y subcategorías): ");
+
+        Usuario[] resultados = sistema.buscarProfesionalesPorHabilidad(habilidadBuscada);
+
+        if (resultados.length == 0) {
+            System.out.println("\n[ℹ️] No se encontraron profesionales activos con la habilidad '" + habilidadBuscada + "' o sus derivadas.");
+        } else {
+            System.out.println("\n>> PROFESIONALES ENCONTRADOS (" + resultados.length + ") <<");
+            System.out.println("-------------------------------------------------");
+            for (Usuario u : resultados) {
+                System.out.println(" • @" + u.getNombreUsuario() + " - " + u.getNombre());
+                System.out.println("   Profesión: " + u.getProfesion());
+                System.out.println("   Habilidades: " + u.obtenerHabilidadesString());
+                System.out.println("-------------------------------------------------");
+            }
+        }
+        esperarEnter();
+    }
+
     private void ejecutarVerMiPerfil() {
         System.out.println(sistema.getUsuarioActual().toString());
         esperarEnter();
@@ -251,14 +274,10 @@ public class Consola {
 
     private void ejecutarEditarPerfil() {
         imprimirEncabezado("EDITAR MI PERFIL");
-        System.out.print("Nombre personal completo: ");
-        String nombre = scanner.nextLine();
-        System.out.print("Profesión: ");
-        String profesion = scanner.nextLine();
-        System.out.print("Ciudad: ");
-        String ciudad = scanner.nextLine();
-        System.out.print("Resumen: ");
-        String resumen = scanner.nextLine();
+        String nombre = pedirTextoObligatorio("Nombre personal completo: ");
+        String profesion = pedirTextoObligatorio("Profesión: ");
+        String ciudad = pedirTextoObligatorio("Ciudad: ");
+        String resumen = pedirTextoObligatorio("Resumen: ");
 
         sistema.editarPerfilActual(nombre, profesion, ciudad, resumen);
         esperarEnter();
@@ -270,46 +289,55 @@ public class Consola {
     }
 
     private void ejecutarAgregarHabilidad() {
-        imprimirEncabezado("AGREGAR HABILIDAD");
-        System.out.println("Catálogo de Habilidades Disponibles:");
-        System.out.println("1. Tecnología y Sistemas");
-        System.out.println("2. Desarrollo de Software");
-        System.out.println("3. Datos e IA");
-        System.out.println("4. Java");
-        System.out.println("5. Python");
-        System.out.println("6. Desarrollo Web (HTML/CSS)");
-        System.out.println("7. SQL");
-        System.out.println("8. Machine Learning");
-        System.out.println("0. Cancelar");
-        System.out.println("-------------------------------------------------");
+        ArbolHabilidades arbol = sistema.getArbolHabilidades();
+        String categoriaActual = "Competencias Laborales";
 
-        int opcion = pedirEntero("Seleccione el número de la habilidad: ");
-        String habilidadSeleccionada = "";
+        while (true) {
+            imprimirEncabezado("AGREGAR HABILIDAD - NAVEGACIÓN JERÁRQUICA");
+            System.out.println("Categoría actual: " + categoriaActual);
+            System.out.println("-------------------------------------------------");
 
-        switch (opcion) {
-            case 1: habilidadSeleccionada = "Tecnología y Sistemas"; break;
-            case 2: habilidadSeleccionada = "Desarrollo de Software"; break;
-            case 3: habilidadSeleccionada = "Datos e IA"; break;
-            case 4: habilidadSeleccionada = "Java"; break;
-            case 5: habilidadSeleccionada = "Python"; break;
-            case 6: habilidadSeleccionada = "Desarrollo Web (HTML/CSS)"; break;
-            case 7: habilidadSeleccionada = "SQL"; break;
-            case 8: habilidadSeleccionada = "Machine Learning"; break;
-            case 0: return;
-            default:
-                System.out.println("[❌] Opción inválida.");
+            Habilidad[] hijos = arbol.obtenerHijosDirectos(categoriaActual);
+
+            int index = 1;
+            for (Habilidad hijo : hijos) {
+                System.out.println(index + ". Ir a -> " + hijo.getNombre() + " [" + hijo.getCategoria() + "]");
+                index++;
+            }
+
+            System.out.println(index + ". [SELECCIONAR] Cargar '" + categoriaActual + "' a mi perfil");
+            System.out.println("0. Cancelar / Volver");
+            System.out.println("-------------------------------------------------");
+
+            int opcion = pedirEntero("Seleccione una opción: ");
+
+            if (opcion == 0) {
+                if (categoriaActual.equals("Competencias Laborales")) {
+                    System.out.println("[ℹ️] Operación cancelada.");
+                    esperarEnter();
+                    return;
+                } else {
+                    categoriaActual = "Competencias Laborales";
+                    continue;
+                }
+            }
+
+            if (opcion > 0 && opcion < index) {
+                categoriaActual = hijos[opcion - 1].getNombre();
+            } else if (opcion == index) {
+                sistema.agregarHabilidadAlPerfilActual(categoriaActual);
                 esperarEnter();
                 return;
+            } else {
+                System.out.println("[❌] Opción inválida.");
+                esperarEnter();
+            }
         }
-
-        sistema.agregarHabilidadAlPerfilActual(habilidadSeleccionada);
-        esperarEnter();
     }
 
     private void ejecutarEnviarSolicitud() {
         imprimirEncabezado("ENVIAR SOLICITUD DE CONEXIÓN");
-        System.out.print("Ingrese el nombre de usuario exacto a conectar (sin @): ");
-        String nombreUsuario = scanner.nextLine();
+        String nombreUsuario = pedirNombreUsuario("Ingrese el nombre de usuario exacto a conectar (sin @): ");
         sistema.enviarSolicitudConexion(nombreUsuario);
         esperarEnter();
     }
@@ -366,12 +394,9 @@ public class Consola {
 
     private void ejecutarCrearOferta() {
         imprimirEncabezado("CREAR OFERTA DE TRABAJO");
-        System.out.print("Título de la oferta: ");
-        String titulo = scanner.nextLine();
-        System.out.print("Descripción: ");
-        String descripcion = scanner.nextLine();
-        System.out.print("Habilidades requeridas: ");
-        String habilidades = scanner.nextLine();
+        String titulo = pedirTextoObligatorio("Título de la oferta: ");
+        String descripcion = pedirTextoObligatorio("Descripción: ");
+        String habilidades = pedirTextoObligatorio("Habilidades requeridas: ");
 
         sistema.crearOferta(sistema.getUsuarioActual().getId(), titulo, descripcion, habilidades);
         esperarEnter();
@@ -513,6 +538,56 @@ public class Consola {
                 return Integer.parseInt(entrada);
             } catch (NumberFormatException e) {
                 System.out.println("[❌ ERROR] Entrada inválida. Por favor, introduzca un número entero.");
+            }
+        }
+    }
+
+    private String pedirTextoObligatorio(String mensaje) {
+        String input;
+        while (true) {
+            System.out.print(mensaje);
+            input = scanner.nextLine().trim();
+            if (!input.isEmpty()) {
+                return input;
+            }
+            System.out.println("[⚠️] Error: Este campo es obligatorio y no puede estar vacío.");
+        }
+    }
+
+    private String pedirNombreUsuario() {
+        return pedirNombreUsuario("Nombre de usuario (único, sin espacios ni @): ");
+    }
+
+    private String pedirNombreUsuario(String mensaje) {
+        String input;
+        while (true) {
+            System.out.print(mensaje);
+            input = scanner.nextLine().trim();
+
+            if (input.isEmpty()) {
+                System.out.println("[⚠️] Error: El nombre de usuario no puede estar vacío.");
+            } else if (input.contains(" ") || input.contains("@")) {
+                System.out.println("[⚠️] Error: El nombre de usuario no debe contener espacios ni el símbolo '@'.");
+            } else {
+                return input;
+            }
+        }
+    }
+
+    private String pedirEmail() {
+        return pedirEmail("Email: ");
+    }
+
+    private String pedirEmail(String mensaje) {
+        String input;
+        while (true) {
+            System.out.print(mensaje);
+            input = scanner.nextLine().trim();
+
+            if (input.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                return input;
+            } else {
+                System.out.println("[⚠️] Error: Formato de email inválido. Ejemplo esperado: usuario@dominio.com");
             }
         }
     }

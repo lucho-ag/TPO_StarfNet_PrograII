@@ -33,7 +33,6 @@ public class SistemaRedSocial {
         Usuario[] todos = arbolUsuarios.obtenerTodos();
         for (Usuario u : todos) {
             if (u != null && (u.getEmail().equalsIgnoreCase(email) || u.getNombreUsuario().equalsIgnoreCase(nombreUsuario))) {
-                System.out.println("[❌] Error: ya existe una cuenta con ese email o nombre de usuario.");
                 return false;
             }
         }
@@ -41,7 +40,6 @@ public class SistemaRedSocial {
         Usuario nuevo = new Usuario(nuevoId, nombreUsuario, nombre, email, contrasenia, rol);
         arbolUsuarios.insertar(nuevoId, nuevo);
         grafoContactos.agregarVertice(nuevoId);
-        System.out.println("[✅] Cuenta registrada exitosamente.");
         return true;
     }
 
@@ -378,14 +376,39 @@ public class SistemaRedSocial {
     }
 
     private void cargarArbolHabilidadesDefault() {
-        arbolHabilidades.insertar(0, new Habilidad(1, "Tecnología y Sistemas", "Raíz"));
-        arbolHabilidades.insertar(1, new Habilidad(2, "Desarrollo de Software", "Rama"));
-        arbolHabilidades.insertar(1, new Habilidad(3, "Datos e IA", "Rama"));
+        arbolHabilidades.insertar(0, new Habilidad(1, "Competencias Laborales", "Área Principal"));
+
+        arbolHabilidades.insertar(1, new Habilidad(2, "Desarrollo de Software", "Subárea"));
+        arbolHabilidades.insertar(1, new Habilidad(3, "Datos e Inteligencia Artificial", "Subárea"));
+        arbolHabilidades.insertar(1, new Habilidad(10, "Diseño y Producto Digital", "Subárea"));
+        arbolHabilidades.insertar(1, new Habilidad(11, "Gestión y Negocios", "Subárea"));
+        arbolHabilidades.insertar(1, new Habilidad(12, "Ciberseguridad e Infraestructura", "Subárea"));
+
         arbolHabilidades.insertar(2, new Habilidad(4, "Java", "Tecnología"));
         arbolHabilidades.insertar(2, new Habilidad(5, "Python", "Tecnología"));
-        arbolHabilidades.insertar(2, new Habilidad(6, "Desarrollo Web (HTML/CSS)", "Tecnología"));
+        arbolHabilidades.insertar(2, new Habilidad(6, "TypeScript", "Tecnología"));
+        arbolHabilidades.insertar(2, new Habilidad(13, "C#", "Tecnología"));
+        arbolHabilidades.insertar(2, new Habilidad(14, "React", "Framework"));
+        arbolHabilidades.insertar(2, new Habilidad(15, "Node.js", "Entorno"));
+
         arbolHabilidades.insertar(3, new Habilidad(7, "SQL", "Tecnología"));
-        arbolHabilidades.insertar(3, new Habilidad(8, "Machine Learning", "Tecnología"));
+        arbolHabilidades.insertar(3, new Habilidad(8, "Machine Learning", "Especialidad"));
+        arbolHabilidades.insertar(3, new Habilidad(9, "Power BI", "Herramienta"));
+        arbolHabilidades.insertar(3, new Habilidad(16, "Big Data (Hadoop/Spark)", "Especialidad"));
+        arbolHabilidades.insertar(3, new Habilidad(17, "NoSQL (MongoDB)", "Tecnología"));
+
+        arbolHabilidades.insertar(10, new Habilidad(18, "Figma", "Herramienta"));
+        arbolHabilidades.insertar(10, new Habilidad(19, "Diseño UX/UI", "Metodología"));
+        arbolHabilidades.insertar(10, new Habilidad(20, "Prototipado", "Aptitud"));
+
+        arbolHabilidades.insertar(11, new Habilidad(21, "Metodologías Ágiles (Scrum)", "Metodología"));
+        arbolHabilidades.insertar(11, new Habilidad(22, "Product Management", "Rol"));
+        arbolHabilidades.insertar(11, new Habilidad(23, "Liderazgo de Equipos", "Aptitud"));
+
+        arbolHabilidades.insertar(12, new Habilidad(24, "Docker y Kubernetes", "Herramienta"));
+        arbolHabilidades.insertar(12, new Habilidad(25, "Linux", "Sistema Operativo"));
+        arbolHabilidades.insertar(12, new Habilidad(26, "Ethical Hacking", "Especialidad"));
+        arbolHabilidades.insertar(12, new Habilidad(27, "Cloud Computing (AWS)", "Plataforma"));
     }
 
     public void agregarHabilidadAlPerfilActual(String nombreHabilidad) {
@@ -408,5 +431,57 @@ public class SistemaRedSocial {
 
     public IArbolUsuariosAVL getArbolUsuarios() {
         return arbolUsuarios;
+    }
+
+    public ArbolHabilidades getArbolHabilidades() {
+        return arbolHabilidades;
+    }
+
+    public Usuario[] buscarProfesionalesPorHabilidad(String nombreHabilidad) {
+        Habilidad habBuscada = arbolHabilidades.buscarPorNombre(nombreHabilidad);
+        if (habBuscada == null) {
+            System.out.println("[❌] No existe la habilidad '" + nombreHabilidad + "' en el catálogo.");
+            return new Usuario[0];
+        }
+
+        Usuario[] todos = arbolUsuarios.obtenerTodos();
+        int count = 0;
+        for (Usuario u : todos) {
+            if (u != null && u.isActivo() && u.getRol().equalsIgnoreCase("PROFESIONAL")) {
+                boolean tieneHabilidad = false;
+                Habilidad[] habs = u.getMisHabilidades();
+                int totalHabs = u.getCantHabilidades();
+                for (int i = 0; i < totalHabs; i++) {
+                    if (habs[i] != null && arbolHabilidades.esDescendienteOIgual(nombreHabilidad, habs[i].getNombre())) {
+                        tieneHabilidad = true;
+                        break;
+                    }
+                }
+                if (tieneHabilidad) {
+                    count++;
+                }
+            }
+        }
+
+        Usuario[] resultado = new Usuario[count];
+        int index = 0;
+        for (Usuario u : todos) {
+            if (u != null && u.isActivo() && u.getRol().equalsIgnoreCase("PROFESIONAL")) {
+                boolean tieneHabilidad = false;
+                Habilidad[] habs = u.getMisHabilidades();
+                int totalHabs = u.getCantHabilidades();
+                for (int i = 0; i < totalHabs; i++) {
+                    if (habs[i] != null && arbolHabilidades.esDescendienteOIgual(nombreHabilidad, habs[i].getNombre())) {
+                        tieneHabilidad = true;
+                        break;
+                    }
+                }
+                if (tieneHabilidad) {
+                    resultado[index++] = u;
+                }
+            }
+        }
+
+        return resultado;
     }
 }
