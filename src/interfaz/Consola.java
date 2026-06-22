@@ -171,7 +171,15 @@ public class Consola {
 
     private void ejecutarCrearCuenta() {
         imprimirEncabezado("CREAR CUENTA NUEVA");
-        String nombreUsuario = pedirNombreUsuario();
+        String nombreUsuario;
+        while (true) {
+            nombreUsuario = pedirNombreUsuario();
+            if (sistema.buscarUsuarioPorNombreUsuario(nombreUsuario) != null) {
+                System.out.println("[❌] Error: El usuario '" + nombreUsuario + "' ya está registrado. Por favor elija otro.");
+            } else {
+                break;
+            }
+        }
         String nombre = pedirTextoObligatorio("Nombre personal completo: ");
         String email = pedirEmail();
         String contrasenia = pedirTextoObligatorio("Contraseña: ");
