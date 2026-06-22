@@ -347,14 +347,17 @@ public class Consola {
                 indice++;
             }
 
-            System.out.println(indice + ". [SELECCIONAR] Cargar '" + categoriaActual + "' a mi perfil");
+            boolean esRaiz = categoriaActual.equalsIgnoreCase("Competencias Laborales");
+            if (!esRaiz) {
+                System.out.println(indice + ". [SELECCIONAR] Cargar '" + categoriaActual + "' a mi perfil");
+            }
             System.out.println("0. Cancelar / Volver");
             System.out.println("-------------------------------------------------");
 
             int opcion = pedirEntero("Seleccione una opción: ");
 
             if (opcion == 0) {
-                if (categoriaActual.equals("Competencias Laborales")) {
+                if (esRaiz) {
                     System.out.println("[ℹ️] Operación cancelada.");
                     esperarEnter();
                     return;
@@ -366,7 +369,7 @@ public class Consola {
 
             if (opcion > 0 && opcion < indice) {
                 categoriaActual = hijos[opcion - 1].getNombre();
-            } else if (opcion == indice) {
+            } else if (opcion == indice && !esRaiz) {
                 sistema.agregarHabilidadAlPerfilActual(categoriaActual);
                 esperarEnter();
                 return;
@@ -434,31 +437,103 @@ public class Consola {
         esperarEnter();
     }
 
+    private int obtenerCantidadHabilidadesRequeridas(Oferta o) {
+        if (o.getHabilidadesRequeridas() == null || o.getHabilidadesRequeridas().trim().isEmpty()) {
+            return 0;
+        }
+        return o.getHabilidadesRequeridas().split(",").length;
+    }
+
     private void ejecutarCrearOferta() {
         imprimirEncabezado("CREAR OFERTA DE TRABAJO");
         String titulo = pedirTextoObligatorio("Título de la oferta: ");
         String descripcion = pedirTextoObligatorio("Descripción: ");
-        String habilidades = pedirTextoObligatorio("Habilidades requeridas: ");
-
-        sistema.crearOferta(sistema.getUsuarioActual().getId(), titulo, descripcion, habilidades);
+        
+        String habilidadesValidadas = "";
+        while (true) {
+            System.out.println("Ingrese las habilidades requeridas separadas por coma (ej: Java, SQL, Python):");
+            String habilidadesInput = pedirTextoObligatorio("Habilidades: ");
+            
+            String[] partes = habilidadesInput.split(",");
+            int validasCount = 0;
+            int invalidasCount = 0;
+            String invalidasStr = "";
+            String validasStr = "";
+            
+            for (String p : partes) {
+                String clean = p.trim();
+                if (clean.isEmpty()) continue;
+                if (sistema.getArbolHabilidades().buscarPorNombre(clean) != null) {
+                    validasCount++;
+                    if (!validasStr.isEmpty()) validasStr += ", ";
+                    validasStr += clean;
+                } else {
+                    invalidasCount++;
+                    if (!invalidasStr.isEmpty()) invalidasStr += ", ";
+                    invalidasStr += clean;
+                }
+            }
+            
+            if (invalidasCount > 0) {
+                System.out.println("[⚠️] Las siguientes habilidades no están registradas en el catálogo: " + invalidasStr);
+                if (validasCount > 0) {
+                    System.out.println("Habilidades reconocidas: " + validasStr);
+                    System.out.print("¿Desea crear la oferta sólo con las habilidades reconocidas? (S/N) o 'C' para cancelar: ");
+                    String resp = scanner.nextLine().trim();
+                    if (resp.equalsIgnoreCase("S")) {
+                        habilidadesValidadas = validasStr;
+                        break;
+                    } else if (resp.equalsIgnoreCase("C")) {
+                        System.out.println("[ℹ️] Creación de oferta cancelada.");
+                        esperarEnter();
+                        return;
+                    }
+                } else {
+                    System.out.println("[❌] Ninguna de las habilidades ingresadas es válida.");
+                    System.out.print("¿Desea intentar ingresarlas de nuevo? (S/N): ");
+                    String resp = scanner.nextLine().trim();
+                    if (!resp.equalsIgnoreCase("S")) {
+                        System.out.println("[ℹ️] Creación de oferta cancelada.");
+                        esperarEnter();
+                        return;
+                    }
+                }
+            } else {
+                habilidadesValidadas = validasStr;
+                break;
+            }
+        }
+        
+        boolean exito = sistema.crearOferta(sistema.getUsuarioActual().getId(), titulo, descripcion, habilidadesValidadas);
+        if (exito) {
+            System.out.println("[✅] Oferta de trabajo creada exitosamente con las habilidades: [" + habilidadesValidadas + "]");
+        }
         esperarEnter();
     }
 
     private void ejecutarPostularse() {
         imprimirEncabezado("POSTULARSE A OFERTA");
-        Oferta[] ofertasDisponibles = sistema.obtenerOfertasDeContactos();
+        Oferta[] ofertasDisponibles = sistema.obtenerOfertasGlobalesActivas();
 
         if (ofertasDisponibles.length == 0) {
-            System.out.println("[ℹ️] No hay ofertas laborales activas publicadas por tus contactos.");
+            System.out.println("[ℹ️] No hay ofertas laborales activas en la bolsa de trabajo.");
             esperarEnter();
             return;
         }
 
-        System.out.println("Ofertas publicadas por tus contactos:");
+        sistema.ordenarOfertasPorCoincidencia(sistema.getUsuarioActual(), ofertasDisponibles);
+
+        System.out.println("Ofertas de trabajo activas en el sistema (ordenadas por coincidencia con tu perfil):");
         for (int i = 0; i < ofertasDisponibles.length; i++) {
             Usuario reclutador = sistema.getArbolUsuarios().buscar(ofertasDisponibles[i].getIdReclutador());
             String nombreRec = reclutador != null ? reclutador.getNombreUsuario() : "Desconocido";
-            System.out.println((i + 1) + ". " + ofertasDisponibles[i].getTitulo() + " (@" + nombreRec + ")");
+            
+            int coincidencia = sistema.calcularCoincidenciaHabilidades(sistema.getUsuarioActual(), ofertasDisponibles[i]);
+            int totalRequeridas = obtenerCantidadHabilidadesRequeridas(ofertasDisponibles[i]);
+            
+            System.out.println((i + 1) + ". " + ofertasDisponibles[i].getTitulo() + " (@" + nombreRec + ")" +
+                    " | Coincidencia: " + coincidencia + "/" + totalRequeridas + " (" + 
+                    (totalRequeridas > 0 ? (coincidencia * 100 / totalRequeridas) : 0) + "%)");
         }
         System.out.println("0. Cancelar");
         System.out.println("-------------------------------------------------");
@@ -475,7 +550,12 @@ public class Consola {
         System.out.println("Publicado por: @" + infoRec);
         System.out.println("Título: " + seleccionada.getTitulo());
         System.out.println("Descripción: " + seleccionada.getDescripcion());
-        System.out.println("Habilidades: " + seleccionada.getHabilidadesRequeridas());
+        System.out.println("Habilidades requeridas: " + seleccionada.getHabilidadesRequeridas());
+        
+        int coincidencia = sistema.calcularCoincidenciaHabilidades(sistema.getUsuarioActual(), seleccionada);
+        int totalRequeridas = obtenerCantidadHabilidadesRequeridas(seleccionada);
+        System.out.println("Tu Coincidencia: " + coincidencia + "/" + totalRequeridas + " (" + 
+                (totalRequeridas > 0 ? (coincidencia * 100 / totalRequeridas) : 0) + "%)");
         System.out.println("-------------------------------------------------");
 
         System.out.print("¿Desea postularse a esta oferta? (S/N): ");
@@ -523,12 +603,12 @@ public class Consola {
         }
 
         if (ofertaSeleccionada.getColaPostulantes().estaVacia()) {
-            System.out.println("[ℹ️] La cola de postulantes para esta oferta de empleo está vacía.");
+            System.out.println("[ℹ️] No hay postulantes para esta oferta laboral por ahora.");
             esperarEnter();
             return;
         }
 
-        System.out.println("\n[⏳] Procesando postulantes por estricto orden de llegada (FIFO)...");
+        System.out.println("\n[⏳] Procesando postulantes por estricto orden de llegada ...");
 
         while (!ofertaSeleccionada.getColaPostulantes().estaVacia()) {
 
@@ -537,8 +617,13 @@ public class Consola {
             Usuario candidato = sistema.getArbolUsuarios().buscar(idCandidato);
 
             if (candidato != null) {
-                imprimirEncabezado("POSTULANTE EN TURNO (El 1° de la fila)");
-                System.out.println(candidato.toString()); // Muestra su currículum / perfil
+                imprimirEncabezado("POSTULANTE EN TURNO");
+                System.out.println(candidato.toString());
+                
+                int coincidencia = sistema.calcularCoincidenciaHabilidades(candidato, ofertaSeleccionada);
+                int totalRequeridas = obtenerCantidadHabilidadesRequeridas(ofertaSeleccionada);
+                System.out.println("  Coincidencia con Oferta: " + coincidencia + "/" + totalRequeridas + 
+                        " (" + (totalRequeridas > 0 ? (coincidencia * 100 / totalRequeridas) : 0) + "%)\n");
 
                 System.out.println("¿Qué decisión desea tomar con este profesional?");
                 System.out.println("1. ACEPTAR (Contratar y CERRAR de forma definitiva la oferta)");
@@ -550,8 +635,13 @@ public class Consola {
                 } while (decision != 1 && decision != 2);
 
                 if (decision == 1) {
-                    sistema.cerrarOferta(ofertaSeleccionada.getId());
+                    boolean nuevaConexion = sistema.contratarCandidato(ofertaSeleccionada.getId(), candidato.getId());
                     System.out.println("\n[🎉] ¡Contratación exitosa! Has incorporado a " + candidato.getNombre() + ".");
+                    if (nuevaConexion) {
+                        System.out.println("[🤝] ¡Nueva conexión establecida! Se ha agregado a @" + candidato.getNombreUsuario() + " a tus contactos directos.");
+                    } else {
+                        System.out.println("[ℹ️] Ya estabas conectado con @" + candidato.getNombreUsuario() + ".");
+                    }
                     System.out.println("[ℹ️] La búsqueda finalizó y la oferta se encuentra CERRADA.");
                     esperarEnter();
 

@@ -322,6 +322,24 @@ public class SistemaRedSocial {
         return resultado;
     }
 
+    public Oferta[] obtenerOfertasGlobalesActivas() {
+        int count = 0;
+        for (int i = 0; i < cantidadOfertas; i++) {
+            if (ofertas[i] != null && ofertas[i].getEstado().equals("ACTIVA")) {
+                count++;
+            }
+        }
+
+        Oferta[] resultado = new Oferta[count];
+        int index = 0;
+        for (int i = 0; i < cantidadOfertas; i++) {
+            if (ofertas[i] != null && ofertas[i].getEstado().equals("ACTIVA")) {
+                resultado[index++] = ofertas[i];
+            }
+        }
+        return resultado;
+    }
+
     public boolean postularse(int idUsuario, int idOferta) {
         Usuario u = arbolUsuarios.buscar(idUsuario);
         if (u == null || !u.isActivo()) return false;
@@ -369,6 +387,20 @@ public class SistemaRedSocial {
         }
     }
 
+    public boolean contratarCandidato(int idOferta, int idCandidato) {
+        Oferta o = obtenerOfertaPropia(idOferta);
+        if (o == null) return false;
+
+        o.cerrar();
+
+        int idReclutador = o.getIdReclutador();
+        if (!grafoContactos.existeArista(idReclutador, idCandidato)) {
+            grafoContactos.agregarArista(idReclutador, idCandidato);
+            return true;
+        }
+        return false;
+    }
+
     public Usuario getUsuarioActual() {
         return usuarioActual;
     }
@@ -411,6 +443,11 @@ public class SistemaRedSocial {
 
     public void agregarHabilidadAlPerfilActual(String nombreHabilidad) {
         if (this.usuarioActual == null) return;
+
+        if (nombreHabilidad.equalsIgnoreCase("Competencias Laborales")) {
+            System.out.println("[❌] No es posible agregar la raíz 'Competencias Laborales' como habilidad.");
+            return;
+        }
 
         Habilidad habEncontrada = arbolHabilidades.buscarPorNombre(nombreHabilidad);
 
@@ -481,5 +518,54 @@ public class SistemaRedSocial {
         }
 
         return resultado;
+    }
+
+    public int calcularCoincidenciaHabilidades(Usuario profesional, Oferta oferta) {
+        if (profesional == null || oferta == null) return 0;
+        String reqStr = oferta.getHabilidadesRequeridas();
+        if (reqStr == null || reqStr.trim().isEmpty()) return 0;
+
+        String[] reqHabs = reqStr.split(",");
+        int coincidencias = 0;
+
+        Habilidad[] misHabs = profesional.getMisHabilidades();
+        int cantHabs = profesional.getCantHabilidades();
+
+        for (String reqHab : reqHabs) {
+            String cleanReq = reqHab.trim();
+            for (int i = 0; i < cantHabs; i++) {
+                Habilidad miHab = misHabs[i];
+                if (miHab != null) {
+                    if (arbolHabilidades.esDescendienteOIgual(cleanReq, miHab.getNombre())) {
+                        coincidencias++;
+                        break;
+                    }
+                }
+            }
+        }
+        return coincidencias;
+    }
+
+    public void ordenarOfertasPorCoincidencia(Usuario profesional, Oferta[] listaOfertas) {
+        if (listaOfertas == null || listaOfertas.length <= 1) return;
+
+        for (int i = 0; i < listaOfertas.length - 1; i++) {
+            int maxIdx = i;
+            int maxMatch = calcularCoincidenciaHabilidades(profesional, listaOfertas[i]);
+
+            for (int j = i + 1; j < listaOfertas.length; j++) {
+                int coincidenciaActual = calcularCoincidenciaHabilidades(profesional, listaOfertas[j]);
+                if (coincidenciaActual > maxMatch) {
+                    maxMatch = coincidenciaActual;
+                    maxIdx = j;
+                }
+            }
+
+            if (maxIdx != i) {
+                Oferta temp = listaOfertas[i];
+                listaOfertas[i] = listaOfertas[maxIdx];
+                listaOfertas[maxIdx] = temp;
+            }
+        }
     }
 }
