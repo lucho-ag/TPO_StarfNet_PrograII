@@ -82,14 +82,14 @@ public class Usuario {
     @Override
     public String toString() {
         return "================================\n" +
-                "  Usuario  : @" + nombreUsuario + "\n" +
-                "  Nombre   : " + nombre + "\n" +
-                "  Profesión: " + getProfesion() + "\n" +
-                "  Habilidades: " + obtenerHabilidadesString() + "\n" +
-                "  Ciudad   : " + getCiudad() + "\n" +
-                "  Resumen  : " + getResumen() + "\n" +
-                "  Rol      : " + rol + "\n" +
-                "  Estado   : " + (activo ? "Activo" : "Inactivo") + "\n" +
+                "  Usuario        : @" + nombreUsuario + "\n" +
+                "  Nombre Completo: " + nombre + "\n" +
+                "  Profesión      : " + getProfesion() + "\n" +
+                "  Habilidades    : " + obtenerHabilidadesString() + "\n" +
+                "  Ciudad         : " + getCiudad() + "\n" +
+                "  Resumen        : " + getResumen() + "\n" +
+                "  Rol            : " + rol + "\n" +
+                "  Estado         : " + (activo ? "Activo" : "Inactivo") + "\n" +
                 "================================";
     }
 }

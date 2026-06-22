@@ -273,14 +273,56 @@ public class Consola {
     }
 
     private void ejecutarEditarPerfil() {
-        imprimirEncabezado("EDITAR MI PERFIL");
-        String nombre = pedirTextoObligatorio("Nombre personal completo: ");
-        String profesion = pedirTextoObligatorio("Profesión: ");
-        String ciudad = pedirTextoObligatorio("Ciudad: ");
-        String resumen = pedirTextoObligatorio("Resumen: ");
+        Usuario u = sistema.getUsuarioActual();
 
-        sistema.editarPerfilActual(nombre, profesion, ciudad, resumen);
-        esperarEnter();
+        String tempNombre = u.getNombre();
+        String tempProfesion = u.getProfesion().equals("-") ? "" : u.getProfesion();
+        String tempCiudad = u.getCiudad().equals("-") ? "" : u.getCiudad();
+        String tempResumen = u.getResumen().equals("-") ? "" : u.getResumen();
+
+        int opcion;
+        do {
+            imprimirEncabezado("EDITAR PERFIL");
+            System.out.println("Seleccione el campo que desea modificar:");
+            System.out.println("1. Nombre completo : " + tempNombre);
+            System.out.println("2. Profesión       : " + (tempProfesion.isEmpty() ? "[Vacío]" : tempProfesion));
+            System.out.println("3. Ciudad          : " + (tempCiudad.isEmpty() ? "[Vacío]" : tempCiudad));
+            System.out.println("4. Resumen         : " + (tempResumen.isEmpty() ? "[Vacío]" : tempResumen));
+            System.out.println("5. [💾] GUARDAR CAMBIOS Y SALIR");
+            System.out.println("0. [❌] Cancelar y descartar cambios");
+            System.out.println("-------------------------------------------------");
+
+            opcion = pedirEntero("Opción: ");
+
+            switch (opcion) {
+                case 1:
+                    tempNombre = pedirTextoObligatorio("Nuevo nombre completo: ");
+                    break;
+                case 2:
+                    System.out.print("Nueva profesión (Enter para dejar vacío): ");
+                    tempProfesion = scanner.nextLine().trim();
+                    break;
+                case 3:
+                    System.out.print("Nueva ciudad (Enter para dejar vacío): ");
+                    tempCiudad = scanner.nextLine().trim();
+                    break;
+                case 4:
+                    System.out.print("Nuevo resumen (Enter para dejar vacío): ");
+                    tempResumen = scanner.nextLine().trim();
+                    break;
+                case 5:
+                    sistema.editarPerfilActual(tempNombre, tempProfesion, tempCiudad, tempResumen);
+                    System.out.println("\n[✅] Perfil actualizado. El estado anterior fue resguardado en el Historial.");
+                    esperarEnter();
+                    return;
+                case 0:
+                    System.out.println("\n[ℹ️] Edición cancelada. Se descartó el borrador.");
+                    esperarEnter();
+                    return;
+                default:
+                    System.out.println("[⚠️] Opción inválida.");
+            }
+        } while (true);
     }
 
     private void ejecutarDeshacerCambio() {
@@ -299,13 +341,13 @@ public class Consola {
 
             Habilidad[] hijos = arbol.obtenerHijosDirectos(categoriaActual);
 
-            int index = 1;
+            int indice = 1;
             for (Habilidad hijo : hijos) {
-                System.out.println(index + ". Ir a -> " + hijo.getNombre() + " [" + hijo.getCategoria() + "]");
-                index++;
+                System.out.println(indice + ". Ir a -> " + hijo.getNombre() + " [" + hijo.getCategoria() + "]");
+                indice++;
             }
 
-            System.out.println(index + ". [SELECCIONAR] Cargar '" + categoriaActual + "' a mi perfil");
+            System.out.println(indice + ". [SELECCIONAR] Cargar '" + categoriaActual + "' a mi perfil");
             System.out.println("0. Cancelar / Volver");
             System.out.println("-------------------------------------------------");
 
@@ -322,9 +364,9 @@ public class Consola {
                 }
             }
 
-            if (opcion > 0 && opcion < index) {
+            if (opcion > 0 && opcion < indice) {
                 categoriaActual = hijos[opcion - 1].getNombre();
-            } else if (opcion == index) {
+            } else if (opcion == indice) {
                 sistema.agregarHabilidadAlPerfilActual(categoriaActual);
                 esperarEnter();
                 return;

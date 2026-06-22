@@ -90,8 +90,6 @@ public class SistemaRedSocial {
         this.usuarioActual.setProfesion(profesion);
         this.usuarioActual.setCiudad(ciudad);
         this.usuarioActual.setResumen(resumen);
-
-        System.out.println("[✅] Perfil actualizado con éxito. Cambio respaldado en el historial.");
     }
 
     public boolean deshacerUltimoCambio() {
