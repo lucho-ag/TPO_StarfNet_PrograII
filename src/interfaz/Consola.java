@@ -186,7 +186,18 @@ public class Consola {
         }
         String nombre = pedirTextoObligatorio("Nombre personal completo: ");
         String email = pedirEmail();
-        String contrasenia = pedirTextoObligatorio("Contraseña: ");
+        
+        String contrasenia = "";
+        while (true) {
+            String c1 = pedirContrasenia("Contraseña: ");
+            String c2 = pedirContrasenia("Repita la contraseña: ");
+            if (c1.equals(c2)) {
+                contrasenia = c1;
+                break;
+            } else {
+                System.out.println("[❌] Error: Las contraseñas no coinciden. Intente nuevamente.\n");
+            }
+        }
 
         int tipo = 0;
         do {
@@ -214,7 +225,7 @@ public class Consola {
     private boolean ejecutarIniciarSesion() {
         imprimirEncabezado("INICIAR SESIÓN");
         String email = pedirEmail();
-        String contrasenia = pedirTextoObligatorio("Contraseña: ");
+        String contrasenia = pedirContrasenia("Contraseña: ");
 
         if (sistema.iniciarSesion(email, contrasenia)) {
             if (!sistema.getUsuarioActual().isActivo()) {
@@ -238,8 +249,7 @@ public class Consola {
     }
 
     private void ejecutarEliminarCuenta() {
-        sistema.getUsuarioActual().setActivo(false);
-        sistema.cerrarSesion();
+        sistema.eliminarCuentaActual();
         System.out.println("[✅] Tu cuenta ha sido eliminada por completo.");
         esperarEnter();
     }
@@ -687,6 +697,16 @@ public class Consola {
                 return input;
             }
             System.out.println("[⚠️] Error: Este campo es obligatorio y no puede estar vacío.");
+        }
+    }
+
+    private String pedirContrasenia(String mensaje) {
+        java.io.Console console = System.console();
+        if (console != null) {
+            char[] passwordChars = console.readPassword(mensaje);
+            return new String(passwordChars);
+        } else {
+            return pedirTextoObligatorio(mensaje);
         }
     }
 

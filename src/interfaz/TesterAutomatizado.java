@@ -175,8 +175,7 @@ public class TesterAutomatizado {
         imprimirMenuProfesionalSimulado("facu_ielpi");
         System.out.print("Seleccione una opción: "); System.out.println("14");
         System.out.print("¿Seguro que desea ELIMINAR su cuenta de forma permanente? Escriba 'Si' para confirmar: "); System.out.println("Si");
-        sistema.getUsuarioActual().setActivo(false);
-        sistema.cerrarSesion();
+        sistema.eliminarCuentaActual();
         System.out.println("[✅] Tu cuenta ha sido eliminada por completo.");
 
         System.out.println("\n>>> [LOGIN] Luciano vuelve a ingresar para completar su última opción disponible...");
@@ -185,8 +184,7 @@ public class TesterAutomatizado {
         imprimirMenuReclutadorSimulado("luciano_agostino");
         System.out.print("Seleccione una opción: "); System.out.println("13");
         System.out.print("¿Seguro que desea ELIMINAR su cuenta de forma permanente? Escriba 'Si' para confirmar: "); System.out.println("Si");
-        sistema.getUsuarioActual().setActivo(false);
-        sistema.cerrarSesion();
+        sistema.eliminarCuentaActual();
         System.out.println("[✅] Tu cuenta ha sido eliminada por completo.");
 
         System.out.println("\n=================================================================");

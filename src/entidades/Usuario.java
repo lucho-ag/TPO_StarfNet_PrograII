@@ -69,6 +69,7 @@ public class Usuario {
     public int getCantHabilidades() { return cantHabilidades; }
 
     public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
+    public void setEmail(String email) { this.email = email; }
     public void setNombre(String nombre) { this.nombre = nombre; }
     public void setProfesion(String profesion) { this.profesion = profesion; }
     public void setCiudad(String ciudad) { this.ciudad = ciudad; }

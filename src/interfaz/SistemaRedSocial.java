@@ -64,6 +64,15 @@ public class SistemaRedSocial {
         this.usuarioActual = null;
     }
 
+    public void eliminarCuentaActual() {
+        if (this.usuarioActual != null) {
+            this.usuarioActual.setNombreUsuario(this.usuarioActual.getNombreUsuario() + "_eliminado_" + this.usuarioActual.getId());
+            this.usuarioActual.setEmail(this.usuarioActual.getEmail() + "_eliminado_" + this.usuarioActual.getId());
+            this.usuarioActual.setActivo(false);
+            this.cerrarSesion();
+        }
+    }
+
     public Usuario buscarUsuarioPorNombreUsuario(String nombreUsuario) {
         Usuario[] todos = arbolUsuarios.obtenerTodos();
         for (Usuario u : todos) {
