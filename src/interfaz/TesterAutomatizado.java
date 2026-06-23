@@ -71,7 +71,7 @@ public class TesterAutomatizado {
         sistema.crearOferta(sistema.getUsuarioActual().getId(), "DevOps & Cloud Engineer", "Buscamos experto en automatización, bases de datos y entornos Linux.", "Java, SQL");
 
         imprimirMenuReclutadorSimulado("luciano_agostino");
-        System.out.print("Seleccione una opción: "); System.out.println("9");
+        System.out.print("Seleccione una opción: "); System.out.println("10");
         System.out.print("¿Seguro que desea cerrar sesión? Escriba 'Si' para confirmar: "); System.out.println("Si");
         sistema.cerrarSesion();
         System.out.println("[✅] Sesión cerrada correctamente.");
@@ -144,8 +144,9 @@ public class TesterAutomatizado {
         imprimirMenuProfesionalSimulado("facu_ielpi");
         System.out.print("Seleccione una opción: "); System.out.println("10");
         imprimirEncabezado("POSTULARSE A OFERTA");
-        Oferta[] ofertasDisponibles = sistema.obtenerOfertasDeContactos();
-        System.out.println("Ofertas publicadas por tus contactos:");
+        Oferta[] ofertasDisponibles = sistema.obtenerOfertasGlobalesActivas();
+        sistema.ordenarOfertasPorCoincidencia(sistema.getUsuarioActual(), ofertasDisponibles);
+        System.out.println("Ofertas de trabajo activas en el sistema (ordenadas por coincidencia con tu perfil):");
         for (int i = 0; i < ofertasDisponibles.length; i++) {
             Usuario reclutador = sistema.getArbolUsuarios().buscar(ofertasDisponibles[i].getIdReclutador());
             String nombreRec = reclutador != null ? reclutador.getNombreUsuario() : "Desconocido";
@@ -181,7 +182,7 @@ public class TesterAutomatizado {
         sistema.iniciarSesion("lucho@gmail", "1234");
 
         imprimirMenuReclutadorSimulado("luciano_agostino");
-        System.out.print("Seleccione una opción: "); System.out.println("10");
+        System.out.print("Seleccione una opción: "); System.out.println("11");
         System.out.print("¿Seguro que desea ELIMINAR su cuenta de forma permanente? Escriba 'Si' para confirmar: "); System.out.println("Si");
         sistema.getUsuarioActual().setActivo(false);
         sistema.cerrarSesion();
@@ -223,6 +224,7 @@ public class TesterAutomatizado {
         System.out.println("10. Postularse a una Oferta de Trabajo");
         System.out.println("11. Cerrar Sesión");
         System.out.println("12. Eliminar Cuenta");
+        System.out.println("13. Buscar Profesionales por Habilidad");
         System.out.println("-------------------------------------------------");
     }
 
@@ -236,8 +238,10 @@ public class TesterAutomatizado {
         System.out.println("6. Enviar Solicitud de Conexión");
         System.out.println("7. Procesar Solicitudes Pendientes");
         System.out.println("8. Crear Oferta de Trabajo");
-        System.out.println("9. Cerrar Sesión");
-        System.out.println("10. Eliminar Cuenta");
+        System.out.println("9. Evaluar Postulantes Oferta");
+        System.out.println("10. Cerrar Sesión");
+        System.out.println("11. Eliminar Cuenta");
+        System.out.println("12. Buscar Profesionales por Habilidad");
         System.out.println("-------------------------------------------------");
     }
 

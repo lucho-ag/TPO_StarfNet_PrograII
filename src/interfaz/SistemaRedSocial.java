@@ -289,38 +289,6 @@ public class SistemaRedSocial {
         return true;
     }
 
-    public Oferta[] obtenerOfertasDeContactos() {
-        if (this.usuarioActual == null) return new Oferta[0];
-
-        int[] misContactos = grafoContactos.obtenerContactos(this.usuarioActual.getId());
-        if (misContactos == null || misContactos.length == 0) return new Oferta[0];
-
-        int count = 0;
-        for (int i = 0; i < cantidadOfertas; i++) {
-            if (ofertas[i].getEstado().equals("ACTIVA")) {
-                for (int idContacto : misContactos) {
-                    if (ofertas[i].getIdReclutador() == idContacto) {
-                        count++;
-                        break;
-                    }
-                }
-            }
-        }
-
-        Oferta[] resultado = new Oferta[count];
-        int index = 0;
-        for (int i = 0; i < cantidadOfertas; i++) {
-            if (ofertas[i].getEstado().equals("ACTIVA")) {
-                for (int idContacto : misContactos) {
-                    if (ofertas[i].getIdReclutador() == idContacto) {
-                        resultado[index++] = ofertas[i];
-                        break;
-                    }
-                }
-            }
-        }
-        return resultado;
-    }
 
     public Oferta[] obtenerOfertasGlobalesActivas() {
         int count = 0;
