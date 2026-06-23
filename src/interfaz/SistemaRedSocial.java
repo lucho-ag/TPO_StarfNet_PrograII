@@ -285,7 +285,6 @@ public class SistemaRedSocial {
         }
         int nuevoId = proximoIdOferta++;
         ofertas[cantidadOfertas++] = new Oferta(nuevoId, idReclutador, titulo, descripcion, habilidades);
-        System.out.println("Oferta creada con éxito.");
         return true;
     }
 
@@ -392,21 +391,32 @@ public class SistemaRedSocial {
         arbolHabilidades.insertar(3, new Habilidad(7, "SQL", "Tecnología"));
         arbolHabilidades.insertar(3, new Habilidad(8, "Machine Learning", "Especialidad"));
         arbolHabilidades.insertar(3, new Habilidad(9, "Power BI", "Herramienta"));
-        arbolHabilidades.insertar(3, new Habilidad(16, "Big Data (Hadoop/Spark)", "Especialidad"));
-        arbolHabilidades.insertar(3, new Habilidad(17, "NoSQL (MongoDB)", "Tecnología"));
+        arbolHabilidades.insertar(3, new Habilidad(16, "Big Data", "Especialidad"));
+        arbolHabilidades.insertar(3, new Habilidad(17, "NoSQL", "Tecnología"));
+
+        arbolHabilidades.insertar(16, new Habilidad(28, "Hadoop", "Framework"));
+        arbolHabilidades.insertar(16, new Habilidad(29, "Spark", "Framework"));
+
+        arbolHabilidades.insertar(17, new Habilidad(30, "MongoDB", "Base de Datos"));
 
         arbolHabilidades.insertar(10, new Habilidad(18, "Figma", "Herramienta"));
         arbolHabilidades.insertar(10, new Habilidad(19, "Diseño UX/UI", "Metodología"));
         arbolHabilidades.insertar(10, new Habilidad(20, "Prototipado", "Aptitud"));
 
-        arbolHabilidades.insertar(11, new Habilidad(21, "Metodologías Ágiles (Scrum)", "Metodología"));
+        arbolHabilidades.insertar(11, new Habilidad(21, "Metodologías Ágiles", "Metodología"));
         arbolHabilidades.insertar(11, new Habilidad(22, "Product Management", "Rol"));
         arbolHabilidades.insertar(11, new Habilidad(23, "Liderazgo de Equipos", "Aptitud"));
+
+        arbolHabilidades.insertar(21, new Habilidad(31, "Scrum", "Framework"));
 
         arbolHabilidades.insertar(12, new Habilidad(24, "Docker y Kubernetes", "Herramienta"));
         arbolHabilidades.insertar(12, new Habilidad(25, "Linux", "Sistema Operativo"));
         arbolHabilidades.insertar(12, new Habilidad(26, "Ethical Hacking", "Especialidad"));
-        arbolHabilidades.insertar(12, new Habilidad(27, "Cloud Computing (AWS)", "Plataforma"));
+        arbolHabilidades.insertar(12, new Habilidad(27, "Cloud Computing", "Plataforma"));
+
+        arbolHabilidades.insertar(27, new Habilidad(32, "AWS", "Proveedor"));
+        arbolHabilidades.insertar(27, new Habilidad(33, "Azure", "Proveedor"));
+        arbolHabilidades.insertar(27, new Habilidad(34, "Google Cloud", "Proveedor"));
     }
 
     public void agregarHabilidadAlPerfilActual(String nombreHabilidad) {
@@ -443,8 +453,7 @@ public class SistemaRedSocial {
     public Usuario[] buscarProfesionalesPorHabilidad(String nombreHabilidad) {
         Habilidad habBuscada = arbolHabilidades.buscarPorNombre(nombreHabilidad);
         if (habBuscada == null) {
-            System.out.println("[❌] No existe la habilidad '" + nombreHabilidad + "' en el catálogo.");
-            return new Usuario[0];
+            return null;
         }
 
         Usuario[] todos = arbolUsuarios.obtenerTodos();

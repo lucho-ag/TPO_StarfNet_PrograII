@@ -1,4 +1,5 @@
 package estructurasTDA;
+
 import entidades.Habilidad;
 
 public class ArbolHabilidades implements IArbolHabilidades {
@@ -34,7 +35,6 @@ public class ArbolHabilidades implements IArbolHabilidades {
         }
     }
 
-
     private NodoArbolHabilidades buscarNodo(NodoArbolHabilidades nodo, int id) {
         if (nodo == null) return null;
         if (nodo.habilidad.getId() == id) return nodo;
@@ -45,26 +45,32 @@ public class ArbolHabilidades implements IArbolHabilidades {
 
     @Override
     public Habilidad buscarPorNombre(String nombre) {
-        NodoArbolHabilidades nodo = buscarNodoPorNombre(raiz, nombre);
+        if (nombre == null) return null;
+        NodoArbolHabilidades nodo = buscarNodoPorNombreRecursivo(raiz, nombre.trim());
         return nodo != null ? nodo.habilidad : null;
     }
 
-    private NodoArbolHabilidades buscarNodoPorNombre(NodoArbolHabilidades nodo, String nombre) {
-        if (nodo == null) return null;
+    private NodoArbolHabilidades buscarNodoPorNombreRecursivo(NodoArbolHabilidades nodo, String nombre) {
+        if (nodo == null) {
+            return null;
+        }
 
-        if (nodo.habilidad.getNombre().equalsIgnoreCase(nombre.trim())) {
+        if (nodo.habilidad.getNombre().equalsIgnoreCase(nombre)) {
             return nodo;
         }
 
-        NodoArbolHabilidades encontrado = buscarNodoPorNombre(nodo.primerHijo, nombre);
-        if (encontrado != null) return encontrado;
+        NodoArbolHabilidades encontrado = buscarNodoPorNombreRecursivo(nodo.primerHijo, nombre);
+        if (encontrado != null) {
+            return encontrado;
+        }
 
-        return buscarNodoPorNombre(nodo.hermano, nombre);
+        return buscarNodoPorNombreRecursivo(nodo.hermano, nombre);
     }
 
     @Override
     public Habilidad[] obtenerHijosDirectos(String nombreCategoria) {
-        NodoArbolHabilidades nodo = buscarNodoPorNombre(raiz, nombreCategoria);
+        if (nombreCategoria == null) return new Habilidad[0];
+        NodoArbolHabilidades nodo = buscarNodoPorNombreRecursivo(raiz, nombreCategoria.trim());
         if (nodo == null || nodo.primerHijo == null) {
             return new Habilidad[0];
         }
@@ -89,12 +95,16 @@ public class ArbolHabilidades implements IArbolHabilidades {
     @Override
     public boolean esDescendienteOIgual(String nombreAncestro, String nombreHijo) {
         if (nombreAncestro == null || nombreHijo == null) return false;
-        if (nombreAncestro.trim().equalsIgnoreCase(nombreHijo.trim())) return true;
 
-        NodoArbolHabilidades ancestro = buscarNodoPorNombre(raiz, nombreAncestro);
+        String ancestroTrim = nombreAncestro.trim();
+        String hijoTrim = nombreHijo.trim();
+
+        if (ancestroTrim.equalsIgnoreCase(hijoTrim)) return true;
+
+        NodoArbolHabilidades ancestro = buscarNodoPorNombreRecursivo(raiz, ancestroTrim);
         if (ancestro == null) return false;
 
-        NodoArbolHabilidades nodoHijo = buscarNodoPorNombre(ancestro.primerHijo, nombreHijo);
+        NodoArbolHabilidades nodoHijo = buscarNodoPorNombreRecursivo(ancestro.primerHijo, hijoTrim);
         return nodoHijo != null;
     }
 }

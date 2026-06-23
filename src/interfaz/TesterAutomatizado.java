@@ -14,11 +14,11 @@ public class TesterAutomatizado {
         imprimirEncabezado("INICIANDO PRUEBA AUTOMÁTICA EN ORDEN SECUENCIAL");
         System.out.println("Recreando el comportamiento del sistema paso a paso...\n");
 
-        sistema.registrarUsuario("luciano_agostino", "Luciano Agostino", "lucho@gmail", "1234", "RECLUTADOR");
-        sistema.registrarUsuario("facu_ielpi", "Facundo Ielpi", "facu@gmail", "1234", "PROFESIONAL");
+        sistema.registrarUsuario("luciano_agostino", "Luciano Agostino", "lucho@gmail.com", "1234", "RECLUTADOR");
+        sistema.registrarUsuario("facu_ielpi", "Facundo Ielpi", "facu@gmail.com", "1234", "PROFESIONAL");
 
         System.out.println("\n>>> [LOGIN] Luciano inicia sesión como Reclutador...");
-        sistema.iniciarSesion("lucho@gmail", "1234");
+        sistema.iniciarSesion("lucho@gmail.com", "1234");
 
         imprimirMenuReclutadorSimulado("luciano_agostino");
         System.out.print("Seleccione una opción: "); System.out.println("1");
@@ -71,13 +71,13 @@ public class TesterAutomatizado {
         sistema.crearOferta(sistema.getUsuarioActual().getId(), "DevOps & Cloud Engineer", "Buscamos experto en automatización, bases de datos y entornos Linux.", "Java, SQL");
 
         imprimirMenuReclutadorSimulado("luciano_agostino");
-        System.out.print("Seleccione una opción: "); System.out.println("10");
+        System.out.print("Seleccione una opción: "); System.out.println("12");
         System.out.print("¿Seguro que desea cerrar sesión? Escriba 'Si' para confirmar: "); System.out.println("Si");
         sistema.cerrarSesion();
         System.out.println("[✅] Sesión cerrada correctamente.");
 
         System.out.println("\n>>> [LOGIN] Facundo inicia sesión como Profesional...");
-        sistema.iniciarSesion("facu@gmail", "1234");
+        sistema.iniciarSesion("facu@gmail.com", "1234");
 
         imprimirMenuProfesionalSimulado("facu_ielpi");
         System.out.print("Seleccione una opción: "); System.out.println("1");
@@ -167,22 +167,23 @@ public class TesterAutomatizado {
         }
 
         imprimirMenuProfesionalSimulado("facu_ielpi");
-        System.out.print("Seleccione una opción: "); System.out.println("11");
+        System.out.print("Seleccione una opción: "); System.out.println("13");
         System.out.print("¿Seguro que desea cerrar sesión? Escriba 'Si' para confirmar: "); System.out.println("Si");
+        sistema.cerrarSesion();
         System.out.println("[✅] Sesión cerrada correctamente.");
 
         imprimirMenuProfesionalSimulado("facu_ielpi");
-        System.out.print("Seleccione una opción: "); System.out.println("12");
+        System.out.print("Seleccione una opción: "); System.out.println("14");
         System.out.print("¿Seguro que desea ELIMINAR su cuenta de forma permanente? Escriba 'Si' para confirmar: "); System.out.println("Si");
         sistema.getUsuarioActual().setActivo(false);
         sistema.cerrarSesion();
         System.out.println("[✅] Tu cuenta ha sido eliminada por completo.");
 
         System.out.println("\n>>> [LOGIN] Luciano vuelve a ingresar para completar su última opción disponible...");
-        sistema.iniciarSesion("lucho@gmail", "1234");
+        sistema.iniciarSesion("lucho@gmail.com", "1234");
 
         imprimirMenuReclutadorSimulado("luciano_agostino");
-        System.out.print("Seleccione una opción: "); System.out.println("11");
+        System.out.print("Seleccione una opción: "); System.out.println("13");
         System.out.print("¿Seguro que desea ELIMINAR su cuenta de forma permanente? Escriba 'Si' para confirmar: "); System.out.println("Si");
         sistema.getUsuarioActual().setActivo(false);
         sistema.cerrarSesion();
@@ -222,9 +223,10 @@ public class TesterAutomatizado {
         System.out.println("8. Enviar Solicitud de Conexión");
         System.out.println("9. Procesar Solicitudes Pendientes");
         System.out.println("10. Postularse a una Oferta de Trabajo");
-        System.out.println("11. Cerrar Sesión");
-        System.out.println("12. Eliminar Cuenta");
-        System.out.println("13. Buscar Profesionales por Habilidad");
+        System.out.println("11. Buscar Profesionales por Habilidad");
+        System.out.println("12. Ver Catálogo de Habilidades");
+        System.out.println("13. Cerrar Sesión");
+        System.out.println("14. Eliminar Cuenta");
         System.out.println("-------------------------------------------------");
     }
 
@@ -239,9 +241,10 @@ public class TesterAutomatizado {
         System.out.println("7. Procesar Solicitudes Pendientes");
         System.out.println("8. Crear Oferta de Trabajo");
         System.out.println("9. Evaluar Postulantes Oferta");
-        System.out.println("10. Cerrar Sesión");
-        System.out.println("11. Eliminar Cuenta");
-        System.out.println("12. Buscar Profesionales por Habilidad");
+        System.out.println("10. Buscar Profesionales por Habilidad");
+        System.out.println("11. Ver Catálogo de Habilidades");
+        System.out.println("12. Cerrar Sesión");
+        System.out.println("13. Eliminar Cuenta");
         System.out.println("-------------------------------------------------");
     }
 
@@ -254,7 +257,6 @@ public class TesterAutomatizado {
         System.out.print("\nPresione ENTER para continuar...");
         try {
             System.in.read();
-
             int disponibles = System.in.available();
             if (disponibles > 0) {
                 System.in.read(new byte[disponibles]);
@@ -262,5 +264,4 @@ public class TesterAutomatizado {
         } catch (Exception e) {
         }
     }
-
 }
