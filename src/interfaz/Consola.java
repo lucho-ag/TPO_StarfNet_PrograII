@@ -81,9 +81,10 @@ public class Consola {
             System.out.println("8. Enviar Solicitud de Conexión");
             System.out.println("9. Procesar Solicitudes Pendientes");
             System.out.println("10. Postularse a una Oferta de Trabajo");
-            System.out.println("11. Cerrar Sesión");
-            System.out.println("12. Eliminar Cuenta");
-            System.out.println("13. Buscar Profesionales por Habilidad");
+            System.out.println("11. Buscar Profesionales por Habilidad");
+            System.out.println("12. Ver Catálogo de Habilidades");
+            System.out.println("13. Cerrar Sesión");
+            System.out.println("14. Eliminar Cuenta");
             System.out.println("-------------------------------------------------");
             opcion = pedirEntero("Seleccione una opción: ");
             System.out.println();
@@ -99,19 +100,20 @@ public class Consola {
                 case 8: ejecutarEnviarSolicitud(); break;
                 case 9: ejecutarProcesarSolicitud(); break;
                 case 10: ejecutarPostularse(); break;
-                case 11:
+                case 11: ejecutarBuscarProfesionalesPorHabilidad(); break;
+                case 12: ejecutarVerCatalogoHabilidades(); break;
+                case 13:
                     if (pedirConfirmacionSi("¿Seguro que desea cerrar sesión?")) {
                         ejecutarCerrarSesion();
                         return;
                     }
                     break;
-                case 12:
+                case 14:
                     if (pedirConfirmacionSi("¿Seguro que desea ELIMINAR su cuenta de forma permanente?")) {
                         ejecutarEliminarCuenta();
                         return;
                     }
                     break;
-                case 13: ejecutarBuscarProfesionalesPorHabilidad(); break;
                 default:
                     System.out.println("[⚠️] Opción no válida.");
                     esperarEnter();
@@ -132,9 +134,10 @@ public class Consola {
             System.out.println("7. Procesar Solicitudes Pendientes");
             System.out.println("8. Crear Oferta de Trabajo");
             System.out.println("9. Evaluar Postulantes Oferta");
-            System.out.println("10. Cerrar Sesión");
-            System.out.println("11. Eliminar Cuenta");
-            System.out.println("12. Buscar Profesionales por Habilidad");
+            System.out.println("10. Buscar Profesionales por Habilidad");
+            System.out.println("11. Ver Catálogo de Habilidades");
+            System.out.println("12. Cerrar Sesión");
+            System.out.println("13. Eliminar Cuenta");
             System.out.println("-------------------------------------------------");
             opcion = pedirEntero("Seleccione una opción: ");
             System.out.println();
@@ -149,19 +152,20 @@ public class Consola {
                 case 7: ejecutarProcesarSolicitud(); break;
                 case 8: ejecutarCrearOferta(); break;
                 case 9: ejecutarEvaluarCandidatos(); break;
-                case 10:
+                case 10: ejecutarBuscarProfesionalesPorHabilidad(); break;
+                case 11: ejecutarVerCatalogoHabilidades(); break;
+                case 12:
                     if (pedirConfirmacionSi("¿Seguro que desea cerrar sesión?")) {
                         ejecutarCerrarSesion();
                         return;
                     }
                     break;
-                case 11:
+                case 13:
                     if (pedirConfirmacionSi("¿Seguro que desea ELIMINAR su cuenta de forma permanente?")) {
                         ejecutarEliminarCuenta();
                         return;
                     }
                     break;
-                case 12: ejecutarBuscarProfesionalesPorHabilidad(); break;
                 default:
                     System.out.println("[⚠️] Opción no válida.");
                     esperarEnter();
@@ -260,8 +264,18 @@ public class Consola {
 
         Usuario[] resultados = sistema.buscarProfesionalesPorHabilidad(habilidadBuscada);
 
-        if (resultados.length == 0) {
+        if (resultados == null) {
+            System.out.println("\n[❌] No existe la habilidad '" + habilidadBuscada + "' en el catálogo.");
+            System.out.print("¿Desea ver el catálogo completo de habilidades? (S/N): ");
+            String respuesta = scanner.nextLine();
+            if (respuesta.equalsIgnoreCase("S")) {
+                ejecutarVerCatalogoHabilidades();
+            } else {
+                esperarEnter();
+            }
+        } else if (resultados.length == 0) {
             System.out.println("\n[ℹ️] No se encontraron profesionales activos con la habilidad '" + habilidadBuscada + "' o sus derivadas.");
+            esperarEnter();
         } else {
             System.out.println("\n>> PROFESIONALES ENCONTRADOS (" + resultados.length + ") <<");
             System.out.println("-------------------------------------------------");
@@ -271,8 +285,8 @@ public class Consola {
                 System.out.println("   Habilidades: " + u.obtenerHabilidadesString());
                 System.out.println("-------------------------------------------------");
             }
+            esperarEnter();
         }
-        esperarEnter();
     }
 
     private void ejecutarVerMiPerfil() {
@@ -339,52 +353,27 @@ public class Consola {
     }
 
     private void ejecutarAgregarHabilidad() {
-        ArbolHabilidades arbol = sistema.getArbolHabilidades();
-        String categoriaActual = "Competencias Laborales";
+        imprimirEncabezado("AGREGAR HABILIDAD AL PERFIL");
 
         while (true) {
-            imprimirEncabezado("AGREGAR HABILIDAD - NAVEGACIÓN JERÁRQUICA");
-            System.out.println("Categoría actual: " + categoriaActual);
-            System.out.println("-------------------------------------------------");
+            System.out.println("Escriba el nombre de la habilidad que desea agregar.");
+            System.out.println("Opciones: [V] para ver el catálogo completo, [0] para cancelar.");
+            String habilidadNombre = pedirTextoObligatorio("Habilidad: ");
 
-            Habilidad[] hijos = arbol.obtenerHijosDirectos(categoriaActual);
-
-            int indice = 1;
-            for (Habilidad hijo : hijos) {
-                System.out.println(indice + ". Ir a -> " + hijo.getNombre() + " [" + hijo.getCategoria() + "]");
-                indice++;
+            if (habilidadNombre.equalsIgnoreCase("V")) {
+                ejecutarVerCatalogoHabilidades();
+                continue;
             }
 
-            boolean esRaiz = categoriaActual.equalsIgnoreCase("Competencias Laborales");
-            if (!esRaiz) {
-                System.out.println(indice + ". [SELECCIONAR] Cargar '" + categoriaActual + "' a mi perfil");
-            }
-            System.out.println("0. Cancelar / Volver");
-            System.out.println("-------------------------------------------------");
-
-            int opcion = pedirEntero("Seleccione una opción: ");
-
-            if (opcion == 0) {
-                if (esRaiz) {
-                    System.out.println("[ℹ️] Operación cancelada.");
-                    esperarEnter();
-                    return;
-                } else {
-                    categoriaActual = "Competencias Laborales";
-                    continue;
-                }
-            }
-
-            if (opcion > 0 && opcion < indice) {
-                categoriaActual = hijos[opcion - 1].getNombre();
-            } else if (opcion == indice && !esRaiz) {
-                sistema.agregarHabilidadAlPerfilActual(categoriaActual);
+            if (habilidadNombre.equals("0")) {
+                System.out.println("[ℹ️] Operación cancelada.");
                 esperarEnter();
                 return;
-            } else {
-                System.out.println("[❌] Opción inválida.");
-                esperarEnter();
             }
+
+            sistema.agregarHabilidadAlPerfilActual(habilidadNombre);
+            esperarEnter();
+            return;
         }
     }
 
@@ -456,18 +445,18 @@ public class Consola {
         imprimirEncabezado("CREAR OFERTA DE TRABAJO");
         String titulo = pedirTextoObligatorio("Título de la oferta: ");
         String descripcion = pedirTextoObligatorio("Descripción: ");
-        
+
         String habilidadesValidadas = "";
         while (true) {
             System.out.println("Ingrese las habilidades requeridas separadas por coma (ej: Java, SQL, Python):");
             String habilidadesInput = pedirTextoObligatorio("Habilidades: ");
-            
+
             String[] partes = habilidadesInput.split(",");
             int validasCount = 0;
             int invalidasCount = 0;
             String invalidasStr = "";
             String validasStr = "";
-            
+
             for (String p : partes) {
                 String clean = p.trim();
                 if (clean.isEmpty()) continue;
@@ -481,9 +470,16 @@ public class Consola {
                     invalidasStr += clean;
                 }
             }
-            
+
             if (invalidasCount > 0) {
                 System.out.println("[⚠️] Las siguientes habilidades no están registradas en el catálogo: " + invalidasStr);
+
+                System.out.print("¿Desea ver el catálogo de habilidades? (S/N): ");
+                String verCatalogo = scanner.nextLine().trim();
+                if (verCatalogo.equalsIgnoreCase("S")) {
+                    ejecutarVerCatalogoHabilidades();
+                }
+
                 if (validasCount > 0) {
                     System.out.println("Habilidades reconocidas: " + validasStr);
                     System.out.print("¿Desea crear la oferta sólo con las habilidades reconocidas? (S/N) o 'C' para cancelar: ");
@@ -511,10 +507,10 @@ public class Consola {
                 break;
             }
         }
-        
+
         boolean exito = sistema.crearOferta(sistema.getUsuarioActual().getId(), titulo, descripcion, habilidadesValidadas);
         if (exito) {
-            System.out.println("[✅] Oferta de trabajo creada exitosamente con las habilidades: [" + habilidadesValidadas + "]");
+            System.out.println("[✅] Oferta de trabajo creada exitosamente.");
         }
         esperarEnter();
     }
@@ -535,12 +531,12 @@ public class Consola {
         for (int i = 0; i < ofertasDisponibles.length; i++) {
             Usuario reclutador = sistema.getArbolUsuarios().buscar(ofertasDisponibles[i].getIdReclutador());
             String nombreRec = reclutador != null ? reclutador.getNombreUsuario() : "Desconocido";
-            
+
             int coincidencia = sistema.calcularCoincidenciaHabilidades(sistema.getUsuarioActual(), ofertasDisponibles[i]);
             int totalRequeridas = obtenerCantidadHabilidadesRequeridas(ofertasDisponibles[i]);
-            
+
             System.out.println((i + 1) + ". " + ofertasDisponibles[i].getTitulo() + " (@" + nombreRec + ")" +
-                    " | Coincidencia: " + coincidencia + "/" + totalRequeridas + " (" + 
+                    " | Coincidencia: " + coincidencia + "/" + totalRequeridas + " (" +
                     (totalRequeridas > 0 ? (coincidencia * 100 / totalRequeridas) : 0) + "%)");
         }
         System.out.println("0. Cancelar");
@@ -559,10 +555,10 @@ public class Consola {
         System.out.println("Título: " + seleccionada.getTitulo());
         System.out.println("Descripción: " + seleccionada.getDescripcion());
         System.out.println("Habilidades requeridas: " + seleccionada.getHabilidadesRequeridas());
-        
+
         int coincidencia = sistema.calcularCoincidenciaHabilidades(sistema.getUsuarioActual(), seleccionada);
         int totalRequeridas = obtenerCantidadHabilidadesRequeridas(seleccionada);
-        System.out.println("Tu Coincidencia: " + coincidencia + "/" + totalRequeridas + " (" + 
+        System.out.println("Tu Coincidencia: " + coincidencia + "/" + totalRequeridas + " (" +
                 (totalRequeridas > 0 ? (coincidencia * 100 / totalRequeridas) : 0) + "%)");
         System.out.println("-------------------------------------------------");
 
@@ -627,10 +623,10 @@ public class Consola {
             if (candidato != null) {
                 imprimirEncabezado("POSTULANTE EN TURNO");
                 System.out.println(candidato.toString());
-                
+
                 int coincidencia = sistema.calcularCoincidenciaHabilidades(candidato, ofertaSeleccionada);
                 int totalRequeridas = obtenerCantidadHabilidadesRequeridas(ofertaSeleccionada);
-                System.out.println("  Coincidencia con Oferta: " + coincidencia + "/" + totalRequeridas + 
+                System.out.println("  Coincidencia con Oferta: " + coincidencia + "/" + totalRequeridas +
                         " (" + (totalRequeridas > 0 ? (coincidencia * 100 / totalRequeridas) : 0) + "%)\n");
 
                 System.out.println("¿Qué decisión desea tomar con este profesional?");
@@ -741,5 +737,30 @@ public class Consola {
         System.out.print("\nPresione ENTER para continuar...");
         scanner.nextLine();
         System.out.println();
+    }
+
+    private void ejecutarVerCatalogoHabilidades() {
+        imprimirEncabezado("CATÁLOGO GLOBAL DE HABILIDADES");
+        ArbolHabilidades arbol = sistema.getArbolHabilidades();
+        Habilidad[] categoriasPrincipales = arbol.obtenerHijosDirectos("Competencias Laborales");
+        for (Habilidad categoria : categoriasPrincipales) {
+            System.out.println("• " + categoria.getNombre());
+            mostrarHijosRecursivo(arbol, categoria.getNombre(), 1);
+        }
+        System.out.println("-------------------------------------------------");
+        esperarEnter();
+    }
+
+    private void mostrarHijosRecursivo(ArbolHabilidades arbol, String nombrePadre, int nivel) {
+        Habilidad[] hijos = arbol.obtenerHijosDirectos(nombrePadre);
+        if (hijos.length == 0) {
+            return;
+        }
+
+        String indentacion = "  ".repeat(nivel);
+        for (Habilidad hijo : hijos) {
+            System.out.println(indentacion + "└─ " + hijo.getNombre() + " (" + hijo.getCategoria() + ")");
+            mostrarHijosRecursivo(arbol, hijo.getNombre(), nivel + 1);
+        }
     }
 }
